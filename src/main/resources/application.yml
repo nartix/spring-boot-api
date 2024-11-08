@@ -1,0 +1,111 @@
+spring:
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+#    url: ${spring.datasource.url}
+#    user: ${spring.datasource.username}
+#    password: ${spring.datasource.password}
+    default-schema: public
+    enabled: true
+    drop-first: false
+    contexts: dev
+
+  application:
+    name: appone
+
+  profiles:
+    active: dev
+
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: always
+      table-name: spring_session
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+  security:
+#    user:
+#      name: user
+#      password: password
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/
+          jwk-set-uri: http://localhost:8080/oauth2/jwks
+      authorizationserver:
+        jwt:
+            issuer-uri: http://localhost:8080/
+#            key-value: secret-key-id
+            jwk-set-uri: http://localhost:8080/oauth2/jwks
+#            jwk-set-uri: "classpath:jwk-set.json"
+        client:
+          oidc-client:
+            registration:
+              client-id: client-id
+              client-secret: "{bcrypt}$2a$10$HbY00/u6PlgK1DWXw2yDR.jQ5HB/jbzMVu9AvoYdRQPLGWwivakou"
+#              client-secret: "{noop}password"
+              client-authentication-methods: client_secret_basic,client_secret_post,client_secret_jwt,private_key_jwt
+              authorization-grant-types: refresh_token,client_credentials,authorization_code
+              redirect-uris: http://localhost:8080/login/oauth2/code/oidc-client
+              post-logout-redirect-uris: http://localhost:8080/
+              scopes: openid,profile
+            require-authorization-consent: false
+#            token:
+#              access-token-validity: 36000
+#              refresh-token-validity: 36000
+#              access-token-time-to-live: 36000
+  messages:
+    basename: messages
+    encoding: UTF-8
+
+  jackson:
+    time-zone: UTC
+
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  data:
+    rest:
+      basePath: /api/v1
+
+  cloud:
+    vault:
+      uri: ${VAULT_ADDRESS}
+      token: ${VAULT_TOKEN}
+      authentication: token
+      kv:
+        enabled: true
+        backend: kv
+        profiles: dev
+        application-name: SPRINGBOOT
+      generic:
+        default-context: ${spring.cloud.vault.kv.application-name}
+  config:
+    import: vault://,vault://kv/SPRINGBOOT/APPONE,vault://kv/POSTGRESQL
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
+server:
+  servlet:
+    session:
+      timeout: 1h
+
+app:
+  default:
+    timezone: ${TIMEZONE}
