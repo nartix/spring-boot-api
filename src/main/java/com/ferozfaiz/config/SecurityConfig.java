@@ -67,13 +67,15 @@ public class SecurityConfig  {
     }
 
     @Bean
-    @Order(2)
+    @Order(1)
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
         http.authenticationProvider(authenticationProvider());
 
         http.csrf(AbstractHttpConfigurer::disable);
 
-        http.authorizeHttpRequests((authorizeRequests) -> authorizeRequests
+        http
+                .securityMatcher(apiBasePath + "/**")
+                .authorizeHttpRequests((authorizeRequests) -> authorizeRequests
                 .requestMatchers(HttpMethod.PUT, apiBasePath + "/**").hasAuthority("SCOPE_write")
                 .requestMatchers(HttpMethod.PATCH, apiBasePath + "/**").hasAuthority("SCOPE_write")
                 .requestMatchers(HttpMethod.DELETE, apiBasePath + "/**").hasAuthority("SCOPE_write")
@@ -88,13 +90,15 @@ public class SecurityConfig  {
     }
 
     @Bean
-    @Order(1)
+    @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authenticationProvider(authenticationProvider());
 
         http.csrf(AbstractHttpConfigurer::disable);
 
-        http.authorizeHttpRequests((authorizeRequests) -> authorizeRequests
+        http
+                .securityMatcher("/**")
+                .authorizeHttpRequests((authorizeRequests) -> authorizeRequests
                 .anyRequest().permitAll()
         );
 
