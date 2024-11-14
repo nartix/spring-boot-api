@@ -67,7 +67,7 @@ public class SecurityConfig  {
     }
 
     @Bean
-    @Order(1)
+    @Order(2)
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
         http.authenticationProvider(authenticationProvider());
 
@@ -88,15 +88,15 @@ public class SecurityConfig  {
     }
 
     @Bean
-    @Order(2)
+    @Order(1)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authenticationProvider(authenticationProvider());
 
         http.csrf(AbstractHttpConfigurer::disable);
 
-//        http.authorizeHttpRequests((authorizeRequests) -> authorizeRequests
-//                .anyRequest().permitAll()
-//        );
+        http.authorizeHttpRequests((authorizeRequests) -> authorizeRequests
+                .anyRequest().permitAll()
+        );
 
         http.formLogin(Customizer.withDefaults());
         http.httpBasic(Customizer.withDefaults());

@@ -15,7 +15,12 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     @EntityGraph(attributePaths = {User.USER_ROLES_ROLE})
     Optional<User> findByUsername(@Param("username") String username);
+
+    @EntityGraph(attributePaths = {User.USER_ROLES_ROLE})
     Optional<User> findByEmail(@Param("email") String email);
+
+    @EntityGraph(attributePaths = {User.USER_ROLES_ROLE})
+    Optional<User> findById(@Param("id") Long id);
 
     @EntityGraph(attributePaths = {User.USER_ROLES_ROLE})
     List<User> findAll();

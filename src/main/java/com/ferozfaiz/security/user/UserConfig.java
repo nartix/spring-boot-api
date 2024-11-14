@@ -11,17 +11,19 @@ import com.ferozfaiz.security.role.RoleConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.OffsetDateTime;
 import java.util.Optional;
 
 @Configuration
-@AutoConfigureAfter(RoleConfig.class)
-@DependsOn("entityManagerFactory")
+@DependsOn({"entityManagerFactory", "liquibase"})
 public class UserConfig {
 
     @Autowired
@@ -37,6 +39,7 @@ public class UserConfig {
     private UserRolesRepository userRolesRepository;
 
     @Bean(name = "userCommandLineRunner")
+    @Order(2)
     CommandLineRunner commandLineRunner() {
         return args -> {
             // Check if the user already exists by email or username

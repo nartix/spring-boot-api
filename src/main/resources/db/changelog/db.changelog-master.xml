@@ -1,34 +1,11 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet author="Feroz (generated)" id="1730397572248-1">
-        <createTable tableName="spring_session">
-            <column name="primary_id" type="CHAR(36)">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="spring_session_pk"/>
-            </column>
-            <column name="session_id" type="CHAR(36)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="creation_time" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_access_time" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="max_inactive_interval" type="INTEGER">
-                <constraints nullable="false"/>
-            </column>
-            <column name="expiry_time" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="principal_name" type="VARCHAR(100)"/>
-        </createTable>
-    </changeSet>
-
-    <changeSet author="Feroz (generated)" id="1730397572248-2">
+    <!-- Main Table Creations -->
+    <changeSet author="Feroz" id="create_users_table">
         <createTable tableName="users">
             <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="users_pkey"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="users_pk"/>
             </column>
             <column name="account_non_expired" type="BOOLEAN">
                 <constraints nullable="false"/>
@@ -65,10 +42,10 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="Feroz (generated)" id="1730397572248-3">
+    <changeSet author="Feroz" id="create_roles_table">
         <createTable tableName="roles">
             <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="roles_pkey"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="roles_pk"/>
             </column>
             <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
@@ -76,10 +53,10 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="Feroz (generated)" id="1730397572248-4">
+    <changeSet author="Feroz" id="create_permissions_table">
         <createTable tableName="permissions">
             <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="permissions_pkey"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="permissions_pk"/>
             </column>
             <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
@@ -87,86 +64,174 @@
         </createTable>
     </changeSet>
 
-    <changeSet author="Feroz (generated)" id="1730397572248-5">
-        <createIndex indexName="spring_session_ix1" tableName="spring_session" unique="true">
-            <column name="session_id"/>
-        </createIndex>
-    </changeSet>
-
-    <changeSet author="Feroz (generated)" id="1730397572248-6">
-        <createIndex indexName="spring_session_ix2" tableName="spring_session">
-            <column name="expiry_time"/>
-        </createIndex>
-    </changeSet>
-
-    <changeSet author="Feroz (generated)" id="1730397572248-7">
-        <createIndex indexName="spring_session_ix3" tableName="spring_session">
-            <column name="principal_name"/>
-        </createIndex>
-    </changeSet>
-
-    <changeSet author="Feroz (generated)" id="1730397572248-8">
-        <addUniqueConstraint columnNames="email" constraintName="uk_user_email" tableName="users"/>
-    </changeSet>
-    <changeSet author="Feroz (generated)" id="1730397572248-9">
-        <addUniqueConstraint columnNames="username" constraintName="uk_user_username" tableName="users"/>
-    </changeSet>
-    <changeSet author="Feroz (generated)" id="1730397572248-10">
-        <addUniqueConstraint columnNames="name" constraintName="ukofx66keruapi6vyqpv6f2or37" tableName="roles"/>
-    </changeSet>
-    <changeSet author="Feroz (generated)" id="1730397572248-11">
-        <addUniqueConstraint columnNames="name" constraintName="ukpnvtwliis6p05pn6i3ndjrqt2" tableName="permissions"/>
-    </changeSet>
-
-    <changeSet author="Feroz (generated)" id="1730397572248-12">
+    <!-- Association Table Creations -->
+    <changeSet author="Feroz" id="create_roles_permissions_table">
         <createTable tableName="roles_permissions">
             <column name="role_id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="roles_permissions_pkey"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="roles_permissions_pk"/>
             </column>
             <column name="permission_id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="roles_permissions_pkey"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="roles_permissions_pk"/>
             </column>
         </createTable>
     </changeSet>
 
-    <changeSet author="Feroz (generated)" id="1730397572248-13">
-        <createTable tableName="spring_session_attributes">
-            <column name="session_primary_id" type="CHAR(36)">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="spring_session_attributes_pk"/>
+    <changeSet author="Feroz" id="create_spring_session_table">
+        <createTable tableName="SPRING_SESSION">
+            <column name="PRIMARY_ID" type="VARCHAR(36)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="SPRING_SESSION_PK"/>
             </column>
-            <column name="attribute_name" type="VARCHAR(200)">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="spring_session_attributes_pk"/>
+            <column name="SESSION_ID" type="VARCHAR(36)">
+                <constraints nullable="false"/>
             </column>
-            <column name="attribute_bytes" type="BYTEA">
+            <column name="CREATION_TIME" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="LAST_ACCESS_TIME" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MAX_INACTIVE_INTERVAL" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EXPIRY_TIME" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PRINCIPAL_NAME" type="VARCHAR(100)"/>
+            <column name="USER_ID" type="BIGINT"/>
+
+            <!-- Geo-location fields -->
+            <column name="LATITUDE" type="DECIMAL(10, 8)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="LONGITUDE" type="DECIMAL(11, 8)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="IP_ADDRESS" type="VARCHAR(45)">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- Additional identifiable information -->
+            <column name="USER_AGENT" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="DEVICE_TYPE" type="VARCHAR(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="LOGIN_TIMESTAMP" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="SESSION_DURATION" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="REFERRER_URL" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="LOCALE" type="VARCHAR(10)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="TIME_ZONE" type="VARCHAR(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="SESSION_STATUS" type="VARCHAR(20)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="FAILED_LOGIN_ATTEMPTS" type="INTEGER">
+                <constraints nullable="true"/>
+            </column>
+            <column name="TWO_FACTOR_AUTH_STATUS" type="BOOLEAN">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <!-- Indexes -->
+        <createIndex indexName="SPRING_SESSION_SPRING_SESSION_IX" tableName="SPRING_SESSION" unique="true">
+            <column name="SESSION_ID"/>
+        </createIndex>
+
+        <createIndex indexName="SPRING_SESSION_EXPIRY_TIME_IX" tableName="SPRING_SESSION">
+            <column name="EXPIRY_TIME"/>
+        </createIndex>
+
+        <createIndex indexName="SPRING_SESSION_PRINCIPAL_NAME_IX" tableName="SPRING_SESSION">
+            <column name="PRINCIPAL_NAME"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="Feroz" id="create_spring_session_attributes_table">
+        <createTable tableName="SPRING_SESSION_ATTRIBUTES">
+            <column name="SESSION_PRIMARY_ID" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ATTRIBUTE_NAME" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ATTRIBUTE_BYTES" type="BYTEA">
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+        <addPrimaryKey
+                tableName="SPRING_SESSION_ATTRIBUTES"
+                columnNames="SESSION_PRIMARY_ID, ATTRIBUTE_NAME"
+                constraintName="SPRING_SESSION_ATTRIBUTES_PK"/>
+
+        <addForeignKeyConstraint
+                baseTableName="SPRING_SESSION_ATTRIBUTES"
+                baseColumnNames="SESSION_PRIMARY_ID"
+                constraintName="SPRING_SESSION_ATTRIBUTES_FK"
+                referencedTableName="SPRING_SESSION"
+                referencedColumnNames="PRIMARY_ID"
+                onDelete="CASCADE"/>
     </changeSet>
 
-    <changeSet author="Feroz (generated)" id="1730397572248-14">
+
+    <changeSet author="Feroz" id="create_user_roles_table">
         <createTable tableName="user_roles">
             <column name="role_id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="user_roles_pkey"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="user_roles_pk"/>
             </column>
             <column name="user_id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="user_roles_pkey"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="user_roles_pk"/>
             </column>
         </createTable>
     </changeSet>
 
-    <changeSet author="Feroz (generated)" id="1730397572248-15">
-        <addForeignKeyConstraint baseColumnNames="permission_id" baseTableName="roles_permissions" constraintName="fkbx9r9uw77p58gsq4mus0mec0o" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="permissions" validate="true"/>
+    <!-- Unique Constraints -->
+    <changeSet author="Feroz" id="add_unique_constraint_email_users">
+        <addUniqueConstraint columnNames="email" constraintName="user_email_uk" tableName="users"/>
     </changeSet>
-    <changeSet author="Feroz (generated)" id="1730397572248-16">
-        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="roles_permissions" constraintName="fkqi9odri6c1o81vjox54eedwyh" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="roles" validate="true"/>
+
+    <changeSet author="Feroz" id="add_unique_constraint_username_users">
+        <addUniqueConstraint columnNames="username" constraintName="user_username_uk" tableName="users"/>
     </changeSet>
-    <changeSet author="Feroz (generated)" id="1730397572248-17">
-        <addForeignKeyConstraint baseColumnNames="session_primary_id" baseTableName="spring_session_attributes" constraintName="spring_session_attributes_fk" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="primary_id" referencedTableName="spring_session" validate="true"/>
+
+    <changeSet author="Feroz" id="add_unique_constraint_name_roles">
+        <addUniqueConstraint columnNames="name" constraintName="roles_name_uk" tableName="roles"/>
     </changeSet>
-    <changeSet author="Feroz (generated)" id="1730397572248-18">
+
+    <changeSet author="Feroz" id="add_unique_constraint_name_permissions">
+        <addUniqueConstraint columnNames="name" constraintName="permissions_name_uk" tableName="permissions"/>
+    </changeSet>
+
+    <!-- Foreign Key Constraints -->
+    <changeSet author="Feroz" id="add_fk_constraint_permission_id_roles_permissions">
+        <addForeignKeyConstraint baseColumnNames="permission_id" baseTableName="roles_permissions" constraintName="roles_permissions_permission_id_fk" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="permissions" validate="true"/>
+    </changeSet>
+
+    <changeSet author="Feroz" id="add_fk_constraint_role_id_roles_permissions">
+        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="roles_permissions" constraintName="roles_permissions_role_id_fk" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="roles" validate="true"/>
+    </changeSet>
+
+<!--    <changeSet author="Feroz" id="add_fk_constraint_session_primary_id_spring_session_attributes">-->
+<!--        <addForeignKeyConstraint baseColumnNames="session_primary_id" baseTableName="spring_session_attributes" constraintName="spring_session_attributes_fk" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="primary_id" referencedTableName="spring_session" validate="true"/>-->
+<!--    </changeSet>-->
+
+    <changeSet author="Feroz" id="add_fk_constraint_role_id_user_roles">
         <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="user_roles" constraintName="user_roles_role_id_fk" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="roles" validate="true"/>
     </changeSet>
-    <changeSet author="Feroz (generated)" id="1730397572248-19">
+
+    <changeSet author="Feroz" id="add_fk_constraint_user_id_user_roles">
         <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_roles" constraintName="user_roles_user_id_fk" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="users" validate="true"/>
     </changeSet>
+
 </databaseChangeLog>

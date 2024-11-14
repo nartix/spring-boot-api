@@ -7,7 +7,7 @@ import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHtt
 import javax.sql.DataSource;
 
 @Configuration
-//@EnableJdbcHttpSession
+@EnableJdbcHttpSession
 public class SessionConfig {
 
 //    private final DataSource dataSource;

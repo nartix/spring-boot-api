@@ -4,9 +4,9 @@ spring:
 #    url: ${spring.datasource.url}
 #    user: ${spring.datasource.username}
 #    password: ${spring.datasource.password}
-    default-schema: public
+    default-schema: dev
     enabled: true
-    drop-first: false
+    drop-first: true
     contexts: dev
 
   application:
@@ -19,7 +19,7 @@ spring:
     store-type: jdbc
     jdbc:
       initialize-schema: always
-      table-name: spring_session
+      table-name: SPRING_SESSION
 
   mvc:
     throw-exception-if-no-handler-found: true
