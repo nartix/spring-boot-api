@@ -100,7 +100,7 @@ public class AuthorizationServerConfig {
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://localhost:8080/login/oauth2/code/oidc-client")
+//                .redirectUri("http://localhost:8080/login/oauth2/code/oidc-client")
                 .scope("read")
                 .scope("write")
                 .scope("openid")
