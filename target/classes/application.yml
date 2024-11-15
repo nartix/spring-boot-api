@@ -44,14 +44,14 @@ spring:
         client:
           oidc-client:
             registration:
-              client-id: client-id
-              client-secret: "{bcrypt}$2a$10$HbY00/u6PlgK1DWXw2yDR.jQ5HB/jbzMVu9AvoYdRQPLGWwivakou"
+              client-id: ${NEXTJS_OIDC_CLIENT_ID}
+              client-secret: ${NEXTJS_OIDC_CLIENT_SECRET_ENCODED}
 #              client-secret: "{noop}password"
               client-authentication-methods: client_secret_basic,client_secret_post,client_secret_jwt,private_key_jwt
               authorization-grant-types: refresh_token,client_credentials,authorization_code
               redirect-uris: http://localhost:8080/login/oauth2/code/oidc-client
               post-logout-redirect-uris: http://localhost:8080/
-              scopes: openid,profile
+              scopes: openid,profile,read,write
             require-authorization-consent: false
 #            token:
 #              access-token-validity: 36000
@@ -87,7 +87,7 @@ spring:
       generic:
         default-context: ${spring.cloud.vault.kv.application-name}
   config:
-    import: vault://,vault://kv/SPRINGBOOT/APPONE,vault://kv/POSTGRESQL
+    import: vault://,vault://kv/SPRINGBOOT/APPONE,vault://kv/POSTGRESQL,vault://kv/NEXTJS
 
 management:
   endpoints:

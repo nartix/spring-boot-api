@@ -85,13 +85,19 @@ public class AuthorizationServerConfig {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Value("${NEXTJS_OIDC_CLIENT_ID}")
+    private String clientId;
+
+    @Value("${NEXTJS_OIDC_CLIENT_SECRET_ENCODED}")
+    private String clientSecret;
+
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
-
-//        String encodedSecret = passwordEncoder.encode("client-secret");
+//        String encodedSecret = passwordEncoder.encode("u6PlgK1DWXw2yDR");
+//        System.out.println("encodedSecret: " + encodedSecret);
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("client-id")
-                .clientSecret("{bcrypt}$2a$10$HbY00/u6PlgK1DWXw2yDR.jQ5HB/jbzMVu9AvoYdRQPLGWwivakou")
+                .clientId(clientId)
+                .clientSecret(clientSecret)
 //                .clientSecret("{noop}password")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_JWT)
@@ -100,10 +106,11 @@ public class AuthorizationServerConfig {
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-//                .redirectUri("http://localhost:8080/login/oauth2/code/oidc-client")
+                .redirectUri("http://localhost:8080/login/oauth2/code/oidc-client")
                 .scope("read")
                 .scope("write")
                 .scope("openid")
+                .scope("profile")
                 .tokenSettings(TokenSettings.builder()
                         .accessTokenTimeToLive(Duration.ofMinutes(30))
                         .refreshTokenTimeToLive(Duration.ofHours(1))
