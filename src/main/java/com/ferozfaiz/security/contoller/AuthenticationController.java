@@ -8,6 +8,7 @@ import com.ferozfaiz.security.jwt.util.JwtUtil;
 import com.ferozfaiz.security.user.User;
 import com.ferozfaiz.security.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +58,7 @@ public class AuthenticationController {
 //    }
 
     @PostMapping("/api/v1/auth/login")
-    public ResponseEntity<UserDetails> createAuthenticationToken(@Valid @RequestBody AuthenticationRequestDto authenticationRequestDto) throws Exception {
+    public ResponseEntity<UserDetails> createAuthenticationToken(@Valid @RequestBody AuthenticationRequestDto authenticationRequestDto, HttpServletRequest request) throws Exception {
         try {
             // Authenticate the user
             authenticationManager.authenticate(
@@ -71,6 +72,10 @@ public class AuthenticationController {
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequestDto.getUsername());
 
         final TokenResponseDto tokens = jwtService.generateTokens(userDetails.getUsername());
+
+        // Create a session and set the user details as an attribute
+        HttpSession session = request.getSession(true);
+        session.setAttribute("user", userDetails);
 
         // Return the token
         return ResponseEntity.ok(userDetails);
