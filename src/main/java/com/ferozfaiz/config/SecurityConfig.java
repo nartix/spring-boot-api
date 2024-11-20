@@ -79,6 +79,7 @@ public class SecurityConfig  {
                 .requestMatchers(HttpMethod.PUT, apiBasePath + "/**").hasAuthority("SCOPE_write")
                 .requestMatchers(HttpMethod.PATCH, apiBasePath + "/**").hasAuthority("SCOPE_write")
                 .requestMatchers(HttpMethod.DELETE, apiBasePath + "/**").hasAuthority("SCOPE_write")
+                .requestMatchers(HttpMethod.POST, apiBasePath + "/**").hasAuthority("SCOPE_write")
                 .anyRequest().permitAll()
         );
 

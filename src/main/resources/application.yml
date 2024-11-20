@@ -16,6 +16,9 @@ spring:
     active: dev
 
   session:
+    # below session timeout did not work, had to set maxInactiveIntervalInSeconds in JdbcHttpSessionConfiguration
+    # or worked after manually configuring session timeout config bean
+    timeout: 2000
     store-type: jdbc
     jdbc:
       initialize-schema: always
@@ -101,11 +104,11 @@ logging:
       springframework:
         security: DEBUG
 
-server:
-  servlet:
-    session:
-      timeout: 1h
-
+## did not work
+#server:
+#  servlet:
+#    session:
+#      timeout: 2000
 app:
   default:
     timezone: ${TIMEZONE}
