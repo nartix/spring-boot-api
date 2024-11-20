@@ -1,5 +1,7 @@
 package com.ferozfaiz.security.contoller;
 
+import com.ferozfaiz.security.session.SpringSession;
+import com.ferozfaiz.security.session.SpringSessionRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,22 +19,41 @@ import org.springframework.web.bind.annotation.GetMapping;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import javax.swing.*;
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/session")
 public class SessionController {
 
-    private final JdbcIndexedSessionRepository sessionRepository;
+//    private final JdbcIndexedSessionRepository sessionRepository;
+//
+//    public SessionController(JdbcIndexedSessionRepository sessionRepository) {
+//        this.sessionRepository = sessionRepository;
+//    }
+//
+    @Autowired
+    SpringSessionRepository springSessionRepository;
 
-    public SessionController(JdbcIndexedSessionRepository sessionRepository) {
-        this.sessionRepository = sessionRepository;
-    }
-
-    @GetMapping("/create")
-    public ResponseEntity<String> createSession(HttpServletRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> createSession(@RequestBody Map<String, String> requestBody, HttpServletRequest request) {
         SessionIdGenerator sessionIdGenerator = UuidSessionIdGenerator.getInstance();
-        HttpSession session = request.getSession(true);
-        session.setAttribute("principal_name", "ferozfaiz");
-//        return ResponseEntity.ok(session.getId());
-        return ResponseEntity.ok(sessionIdGenerator.generate());
+
+        String sessionId1 = sessionIdGenerator.generate();
+        String sessionId2 = sessionIdGenerator.generate();
+
+        SpringSession session = new SpringSession();
+        session.setPrimaryId(sessionId1);
+        session.setSessionId(sessionId1);
+        session.setPrincipalName("ferozfaiz");
+
+
+        springSessionRepository.save(session);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("sessionId1", sessionId1);
+        response.put("sessionId2", sessionId2);
+        return ResponseEntity.ok(response);
     }
 }
