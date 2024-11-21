@@ -49,9 +49,6 @@ public class SpringSession {
     @Column(name = "DEVICE_TYPE", length = 50)
     private String deviceType;
 
-    @Column(name = "LOGIN_TIMESTAMP")
-    private Instant loginTimestamp;
-
     @Column(name = "SESSION_DURATION")
     private Long sessionDuration;
 
@@ -181,14 +178,6 @@ public class SpringSession {
 
     public void setDeviceType(String deviceType) {
         this.deviceType = deviceType;
-    }
-
-    public Instant getLoginTimestamp() {
-        return loginTimestamp;
-    }
-
-    public void setLoginTimestamp(Instant loginTimestamp) {
-        this.loginTimestamp = loginTimestamp;
     }
 
     public Long getSessionDuration() {

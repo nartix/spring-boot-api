@@ -16,10 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -57,6 +54,7 @@ public class AuthenticationController {
 //        return ResponseEntity.ok(tokens);
 //    }
 
+    @CrossOrigin
     @PostMapping("/api/v1/auth/login")
     public ResponseEntity<UserDetails> createAuthenticationToken(@Valid @RequestBody AuthenticationRequestDto authenticationRequestDto, HttpServletRequest request) throws Exception {
         try {
@@ -74,8 +72,8 @@ public class AuthenticationController {
         final TokenResponseDto tokens = jwtService.generateTokens(userDetails.getUsername());
 
         // Create a session and set the user details as an attribute
-        HttpSession session = request.getSession(true);
-        session.setAttribute("user", userDetails);
+//        HttpSession session = request.getSession(true);
+//        session.setAttribute("user", userDetails);
 
         // Return the token
         return ResponseEntity.ok(userDetails);

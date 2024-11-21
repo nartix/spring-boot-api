@@ -5,7 +5,7 @@ logging:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${POSTGRESQL_MASTER_HOST}/springboot
+    url: jdbc:postgresql://${POSTGRESQL_MASTER_HOST}/springboot?currentSchema=public
     username: ${POSTGRESQL_USERNAME}
     password: ${POSTGRESQL_PASSWORD}
     driver-class-name: org.postgresql.Driver

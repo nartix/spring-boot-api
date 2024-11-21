@@ -117,9 +117,6 @@
             <column name="DEVICE_TYPE" type="VARCHAR(50)">
                 <constraints nullable="true"/>
             </column>
-            <column name="LOGIN_TIMESTAMP" type="TIMESTAMP">
-                <constraints nullable="true"/>
-            </column>
             <column name="SESSION_DURATION" type="BIGINT">
                 <constraints nullable="true"/>
             </column>

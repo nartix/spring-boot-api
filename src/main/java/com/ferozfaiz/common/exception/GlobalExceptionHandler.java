@@ -11,6 +11,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -71,6 +72,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 //        exceptionMappers.put(ValidationException.class, new ValidationExceptionMapper());
         exceptionMappers.put(ResourceNotFoundException.class, new GenericExceptionMapper<>());
         exceptionMappers.put(AuthenticationFailedException.class, new GenericExceptionMapper<AuthenticationFailedException>(new ErrorDetailsDto("AUTHENTICATION_FAILED", null, HttpStatusCode.valueOf(401))));
+        exceptionMappers.put(DataIntegrityViolationException.class, new GenericExceptionMapper<>(
+                new ErrorDetailsDto("DATA_INTEGRITY_VIOLATION", "error.data.integrity.violation", HttpStatusCode.valueOf(409))
+        ));
         exceptionMappers.put(
                 org.springframework.data.rest.webmvc.ResourceNotFoundException.class,
                 new GenericExceptionMapper<>(new ErrorDetailsDto("RESOURCE_NOT_FOUND", "error.resource.not.found", HttpStatusCode.valueOf(404)))
