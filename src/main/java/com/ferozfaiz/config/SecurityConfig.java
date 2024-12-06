@@ -77,11 +77,12 @@ public class SecurityConfig  {
         http
                 .securityMatcher(apiBasePath + "/**")
                 .authorizeHttpRequests((authorizeRequests) -> authorizeRequests
-                .requestMatchers(HttpMethod.PUT, apiBasePath + "/**").hasAuthority("SCOPE_write")
-                .requestMatchers(HttpMethod.PATCH, apiBasePath + "/**").hasAuthority("SCOPE_write")
-                .requestMatchers(HttpMethod.DELETE, apiBasePath + "/**").hasAuthority("SCOPE_write")
-                .requestMatchers(HttpMethod.POST, apiBasePath + "/**").hasAuthority("SCOPE_write")
-                .anyRequest().permitAll()
+                        .requestMatchers(HttpMethod.GET, apiBasePath + "/sessions/search/deleteBySessionId").hasAuthority("SCOPE_write")
+                    .requestMatchers(HttpMethod.PUT, apiBasePath + "/**").hasAuthority("SCOPE_write")
+                    .requestMatchers(HttpMethod.PATCH, apiBasePath + "/**").hasAuthority("SCOPE_write")
+                    .requestMatchers(HttpMethod.DELETE, apiBasePath + "/**").hasAuthority("SCOPE_write")
+                    .requestMatchers(HttpMethod.POST, apiBasePath + "/**").hasAuthority("SCOPE_write")
+                    .anyRequest().permitAll()
         );
 
         http.oauth2ResourceServer((oauth2) -> oauth2

@@ -123,6 +123,9 @@
             <column name="REFERRER_URL" type="VARCHAR(255)">
                 <constraints nullable="true"/>
             </column>
+            <column name="URL_PATH" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
             <column name="LOCALE" type="VARCHAR(10)">
                 <constraints nullable="true"/>
             </column>

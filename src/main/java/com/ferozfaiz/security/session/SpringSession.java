@@ -1,6 +1,7 @@
 package com.ferozfaiz.security.session;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Set;
@@ -54,6 +55,9 @@ public class SpringSession {
 
     @Column(name = "REFERRER_URL", length = 255)
     private String referrerUrl;
+
+    @Column(name = "URL_PATH", length = 255)
+    private String urlPath;
 
     @Column(name = "LOCALE", length = 10)
     private String locale;
@@ -194,6 +198,14 @@ public class SpringSession {
 
     public void setReferrerUrl(String referrerUrl) {
         this.referrerUrl = referrerUrl;
+    }
+
+    public String getUrlPath() {
+        return urlPath;
+    }
+
+    public void setUrlPath(String urlPath) {
+        this.urlPath = urlPath;
     }
 
     public String getLocale() {
