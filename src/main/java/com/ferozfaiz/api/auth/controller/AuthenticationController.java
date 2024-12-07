@@ -1,4 +1,4 @@
-package com.ferozfaiz.security.contoller;
+package com.ferozfaiz.api.auth.controller;
 
 import com.ferozfaiz.common.exception.exception.AuthenticationFailedException;
 import com.ferozfaiz.security.dto.AuthenticationRequestDto;
@@ -8,7 +8,6 @@ import com.ferozfaiz.security.jwt.util.JwtUtil;
 import com.ferozfaiz.security.user.User;
 import com.ferozfaiz.security.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,25 +33,25 @@ public class AuthenticationController {
     @Autowired
     private JwtService jwtService;
 
-//    @PostMapping("/api/v1/auth/login")
-//    public ResponseEntity<TokenResponseDto> createAuthenticationToken(@Valid @RequestBody AuthenticationRequestDto authenticationRequestDto) throws Exception {
-//        try {
-//            // Authenticate the user
-//            authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(authenticationRequestDto.getUsername(), authenticationRequestDto.getPassword())
-//            );
-//        } catch (BadCredentialsException e) {
-//            throw new AuthenticationFailedException("Incorrect username or password");
-//        }
-//
-//        // Load user details and generate token
-//        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequestDto.getUsername());
-//
-//        final TokenResponseDto tokens = jwtService.generateTokens(userDetails.getUsername());
-//
-//        // Return the token
-//        return ResponseEntity.ok(tokens);
-//    }
+    @PostMapping("/api/v1/auth/token")
+    public ResponseEntity<TokenResponseDto> createAuthenticationToken(@Valid @RequestBody AuthenticationRequestDto authenticationRequestDto) throws Exception {
+        try {
+            // Authenticate the user
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authenticationRequestDto.getUsername(), authenticationRequestDto.getPassword())
+            );
+        } catch (BadCredentialsException e) {
+            throw new AuthenticationFailedException("Incorrect username or password");
+        }
+
+        // Load user details and generate token
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequestDto.getUsername());
+
+        final TokenResponseDto tokens = jwtService.generateTokens(userDetails.getUsername());
+
+        // Return the token
+        return ResponseEntity.ok(tokens);
+    }
 
     @CrossOrigin
     @PostMapping("/api/v1/auth/login")
