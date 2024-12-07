@@ -78,6 +78,9 @@ public class User implements UserDetails {
     @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private OffsetDateTime updatedAt;
 
+    @Column(name = "last_activity", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    private OffsetDateTime lastActivity;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     @Fetch(FetchMode.JOIN)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -231,6 +234,14 @@ public class User implements UserDetails {
 
     public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public OffsetDateTime getLastActivity() {
+        return lastActivity;
+    }
+
+    public void setLastActivity(OffsetDateTime lastActivity) {
+        this.lastActivity = lastActivity;
     }
 
     public boolean isActive() {

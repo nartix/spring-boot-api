@@ -78,6 +78,8 @@ spring:
       basePath: /api/v1
 
   cloud:
+#    compatibility:
+#      enabled: false
     vault:
       uri: ${VAULT_ADDRESS}
       token: ${VAULT_TOKEN}

@@ -3,21 +3,21 @@ package com.ferozfaiz.api.auth.controller;
 import com.ferozfaiz.common.util.DateTimeUtil;
 import com.ferozfaiz.security.session.SpringSession;
 import com.ferozfaiz.security.session.SpringSessionRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.session.SessionIdGenerator;
 import org.springframework.session.UuidSessionIdGenerator;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("${spring.data.rest.basePath}/auth/sessions")
@@ -67,5 +67,42 @@ public class SessionController {
         response.put("maxInactiveInterval", session.getMaxInactiveInterval());
 
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> updateSession(@RequestBody @Valid Map<String, Object> sessionData) {
+        String sessionId = (String) sessionData.get("sessionId");
+        if (sessionId == null || sessionId.isEmpty()) {
+            return ResponseEntity.badRequest().body("sessionId is required.");
+        }
+
+        Optional<SpringSession> optionalSession = springSessionRepository.findBySessionId(sessionId);
+        if (optionalSession.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        SpringSession session = optionalSession.get();
+
+        // Update session fields
+        if (sessionData.containsKey("ipAddress")) {
+            session.setIpAddress((String) sessionData.get("ipAddress"));
+        }
+        if (sessionData.containsKey("urlPath")) {
+            session.setUrlPath((String) sessionData.get("urlPath"));
+        }
+        if (sessionData.containsKey("userAgent")) {
+            session.setUserAgent((String) sessionData.get("userAgent"));
+        }
+
+        // Update last access time
+        long currentTimeMillis = Instant.now().toEpochMilli();
+        session.setLastAccessTime(currentTimeMillis);
+
+        // Update expiry time
+        session.setExpiryTime(currentTimeMillis + session.getMaxInactiveInterval() * 1000);
+
+        SpringSession updateSession =  springSessionRepository.save(session);
+
+        return ResponseEntity.ok(updateSession);
     }
 }
