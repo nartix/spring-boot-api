@@ -3,6 +3,8 @@ package com.ferozfaiz.api.auth.controller;
 import com.ferozfaiz.common.util.DateTimeUtil;
 import com.ferozfaiz.security.session.SpringSession;
 import com.ferozfaiz.security.session.SpringSessionRepository;
+import com.ferozfaiz.security.user.UserRepository;
+import com.ferozfaiz.security.user.User;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,10 @@ public class SessionController {
 //        this.sessionRepository = sessionRepository;
 //    }
 //
+
+    @Autowired
+    private UserRepository userRepository;
+
     @Autowired
     SpringSessionRepository springSessionRepository;
 
@@ -101,8 +107,18 @@ public class SessionController {
         // Update expiry time
         session.setExpiryTime(currentTimeMillis + session.getMaxInactiveInterval() * 1000);
 
-        SpringSession updateSession =  springSessionRepository.save(session);
+        SpringSession updatedSession =  springSessionRepository.save(session);
 
-        return ResponseEntity.ok(updateSession);
+        // Update user's last activity if userId is present
+        if (session.getUserId() != null) {
+            Optional<User> optionalUser = userRepository.findById(session.getUserId());
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                user.setLastActivity(DateTimeUtil.getCurrentOffsetDateTime());
+                userRepository.save(user);
+            }
+        }
+
+        return ResponseEntity.ok(updatedSession);
     }
 }
