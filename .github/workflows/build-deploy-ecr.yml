@@ -13,8 +13,8 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-        with:
-          ref: docker-release
+#        with:
+#          ref: docker-release
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
