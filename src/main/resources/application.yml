@@ -100,11 +100,11 @@ management:
       exposure:
         include: health,info,metrics
 
-logging:
-  level:
-    org:
-      springframework:
-        security: DEBUG
+#logging:
+#  level:
+#    org:
+#      springframework:
+#        security: DEBUG
 
 ## did not work
 #server:
