@@ -92,7 +92,7 @@ spring:
       generic:
         default-context: ${spring.cloud.vault.kv.application-name}
   config:
-    import: vault://,vault://kv/SPRINGBOOT/APPONE,vault://kv/POSTGRESQL,vault://kv/NEXTJS,vault://kv/VAULT
+    import: vault://,vault://kv/SPRINGBOOT/APPONE,vault://kv/POSTGRESQL,vault://kv/NEXTJS
 
 management:
   endpoints:
