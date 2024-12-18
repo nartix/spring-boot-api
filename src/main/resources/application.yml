@@ -4,16 +4,16 @@ spring:
 #    url: ${spring.datasource.url}
 #    user: ${spring.datasource.username}
 #    password: ${spring.datasource.password}
-    default-schema: dev
+    default-schema: ${spring.profiles.active}
     enabled: true
     drop-first: true
-    contexts: dev
+    contexts: ${spring.profiles.active}
 
   application:
     name: appone
 
   profiles:
-    active: dev
+    active: ${spring.profiles.active}
 
   session:
     # below session timeout did not work, had to set maxInactiveIntervalInSeconds in JdbcHttpSessionConfiguration
@@ -87,7 +87,7 @@ spring:
       kv:
         enabled: true
         backend: kv
-        profiles: dev
+        profiles: ${spring.profiles.active}
         application-name: SPRINGBOOT
       generic:
         default-context: ${spring.cloud.vault.kv.application-name}
