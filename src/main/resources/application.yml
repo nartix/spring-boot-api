@@ -2,7 +2,6 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
     enabled: true
-    drop-first: true # **** WARNING **** change to false in production
     contexts: ${spring.profiles.active}
 
   application:

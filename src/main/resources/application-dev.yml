@@ -16,6 +16,7 @@ spring:
 
   liquibase:
     default-schema: dev
+    drop-first: true
 
   jpa:
     show-sql: true
