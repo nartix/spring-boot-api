@@ -1,12 +1,10 @@
 # Spring Boot API
 
----
-
 ## About the Project
 
 I developed this Spring Boot API for use with a Next.js application that’s currently under development. The API relies on PostgreSQL as the primary database, is secured through OpenID Connect, and leverages Hashicorp Vault for secret management. The application is deployed on a self-managed Kubernetes cluster.
 
-Live Demo: <a href='https://spring-boot-api-ferozfaiz.com/swagger-ui.html'>spring-boot-api.ferozfaiz.com</a>
+Live Demo: <a href='https://spring-boot-api.ferozfaiz.com/swagger-ui.html' target='_blank'>spring-boot-api.ferozfaiz.com</a>
 
 ## Features
 
@@ -41,3 +39,7 @@ Live Demo: <a href='https://spring-boot-api-ferozfaiz.com/swagger-ui.html'>sprin
 
 - **Database & Migrations**: `postgresql`, `liquibase-core`
 - **API Docs**: `springdoc-openapi-starter-webmvc-ui`
+
+## Kubernetes
+
+![Kubernetes](kubernetes.png)
