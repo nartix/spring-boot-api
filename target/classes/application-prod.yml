@@ -10,6 +10,10 @@ spring:
     password: ${POSTGRESQL_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
+  liquibase:
+    default-schema: public
+    drop-first: false
+
   jpa:
 #    show-sql: true
     hibernate:

@@ -1,12 +1,7 @@
 spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
-#    url: ${spring.datasource.url}
-#    user: ${spring.datasource.username}
-#    password: ${spring.datasource.password}
-    default-schema: ${spring.profiles.active}
     enabled: true
-    drop-first: true
     contexts: ${spring.profiles.active}
 
   application:
