@@ -3,7 +3,9 @@ package com.ferozfaiz.common.exception;
 import com.ferozfaiz.common.exception.dto.ErrorDetailsDto;
 import com.ferozfaiz.common.exception.exception.AuthenticationFailedException;
 import com.ferozfaiz.common.exception.exception.ResourceNotFoundException;
-import com.ferozfaiz.common.exception.mapper.*;
+import com.ferozfaiz.common.exception.mapper.ConstraintViolationExceptionMapper;
+import com.ferozfaiz.common.exception.mapper.ExceptionMapper;
+import com.ferozfaiz.common.exception.mapper.GenericExceptionMapper;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,13 +13,18 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.LocalDateTime;
@@ -81,6 +88,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         );
 //        exceptionMappers.put(MethodArgumentNotValidException.class, new MethodArgumentNotValidExceptionMapper(new ErrorDetailsDto("VALIDATION_FAILED", "error.validation.failed", HttpStatusCode.valueOf(400))));
         exceptionMappers.put(ConstraintViolationException.class, new ConstraintViolationExceptionMapper(new ErrorDetailsDto("VALIDATION_FAILED", "error.validation.failed", HttpStatusCode.valueOf(400)), messageSource));
+
+        // Register conversion exception mappers for invalid ID format errors
+        exceptionMappers.put(MethodArgumentTypeMismatchException.class,
+                new GenericExceptionMapper<>(new ErrorDetailsDto("INVALID_VALUE", "error.invalid.value", HttpStatusCode.valueOf(400))));
+        exceptionMappers.put(ConversionFailedException.class,
+                new GenericExceptionMapper<>(new ErrorDetailsDto("INVALID_VALUE", "error.invalid.value", HttpStatusCode.valueOf(400))));
     }
 
     @ExceptionHandler({Throwable.class})
