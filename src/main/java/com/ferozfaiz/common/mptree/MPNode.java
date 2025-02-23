@@ -1,9 +1,9 @@
 package com.ferozfaiz.common.mptree;
 
 
-
-
 import jakarta.persistence.*;
+
+import java.util.List;
 
 /**
  *  @author Feroz Faiz
@@ -11,7 +11,11 @@ import jakarta.persistence.*;
  * All tree-enabled models should extend this class.
  */
 @MappedSuperclass
-public abstract class MPNode {
+public abstract class MPNode<T extends MPNode<T>> {
+
+    public static final int STEPLEN = 4; // Fixed width for each path segment
+    private static final int DEFAULT_STEP_LENGTH = 4;
+    private static final String DEFAULT_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,33 +26,23 @@ public abstract class MPNode {
      * The path is built from fixed-width segments (e.g., 4-character segments).
      * Example: "0001", "00010001", etc.
      */
-    @Column(nullable = false, unique = true, length = 255)
+
+    @Column(name = "path", nullable = false, unique = true, length = 255)
     private String path;
 
     /**
      * The depth (level) of the node in the tree.
      * This is calculated as the number of segments in the path.
      */
-    @Column(nullable = false)
+    @Column(name = "depth", nullable = false)
     private int depth;
 
     /**
      * The number of direct child nodes.
      */
-    @Column(nullable = false)
+    @Column(name = "numchild", nullable = false)
     private int numChild;
 
-    /**
-     * An example additional field.
-     */
-    @Column(length = 100)
-    private String name;
-
-    /**
-     * An example additional field.
-     */
-    @Column(length = 255)
-    private String description;
 
     // Constructors
     public MPNode() {
@@ -59,8 +53,6 @@ public abstract class MPNode {
         this.path = path;
         this.depth = depth;
         this.numChild = numChild;
-        this.name = name;
-        this.description = description;
     }
 
     // Getters and setters
@@ -94,21 +86,44 @@ public abstract class MPNode {
         this.numChild = numChild;
     }
 
-    public String getName() {
-        return name;
+    // Transient cache for the parent node
+    @Transient
+    private T cachedParent;
+
+    /**
+     * Retrieves the parent node.
+     * If update is true, it bypasses any cached parent and fetches a fresh copy.
+     * If this node is a root (depth 1), returns null.
+     *
+     * @param em     the EntityManager used for the lookup
+     * @param update if true, forces a fresh lookup by clearing the cache
+     * @return the parent node of type T, or null if this is a root
+     */
+    @SuppressWarnings("unchecked")
+    public T getParent(EntityManager em, Boolean update) {
+        if (this.getDepth() <= 1) {
+            return null; // Root node has no parent
+        }
+        if (Boolean.TRUE.equals(update)) {
+            cachedParent = null;
+        }
+        if (cachedParent != null) {
+            return cachedParent;
+        }
+        // Compute parent's path by removing the last fixed-length segment
+        String parentPath = this.getPath().substring(0, this.getPath().length() - STEPLEN);
+        // Create a typed query using the runtime class, cast safely to Class<T>
+        TypedQuery<T> query = em.createQuery(
+                "SELECT n FROM " + this.getClass().getSimpleName() + " n WHERE n.path = :parentPath",
+                (Class<T>) this.getClass());
+        query.setParameter("parentPath", parentPath);
+        List<T> result = query.getResultList();
+        if (!result.isEmpty()) {
+            cachedParent = result.get(0);
+        }
+        return cachedParent;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }
 
 

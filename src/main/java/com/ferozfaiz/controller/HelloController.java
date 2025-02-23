@@ -18,6 +18,8 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import javax.crypto.SecretKey;
 
 
+
+
 @RestController
 public class HelloController {
 
@@ -30,12 +32,6 @@ public class HelloController {
     @Autowired
     private DateTimeUtil dateTimeUtil;
 
-//    @PreAuthorize("hasRole('ROLE_MOD')")
-//    @PreAuthorize("hasAuthority('SCOPE_read')")
-    @GetMapping("/hello")
-    public HelloWorld hello() {
-        return new HelloWorld("Hello, World! feroz!aa");
-    }
 
 //    @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/hello2")
