@@ -13,13 +13,12 @@ import java.util.List;
 @MappedSuperclass
 public abstract class MPNode<T extends MPNode<T>> {
 
+//    @Autowired
+//    private transient TreePathService treePathService;
+
     public static final int STEPLEN = 4; // Fixed width for each path segment
     private static final int DEFAULT_STEP_LENGTH = 4;
     private static final String DEFAULT_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     /**
      * The materialized path that represents this node's position in the tree.
@@ -55,11 +54,6 @@ public abstract class MPNode<T extends MPNode<T>> {
         this.numChild = numChild;
     }
 
-    // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
     // No setter for id as it's generated
 
     public String getPath() {
@@ -89,6 +83,21 @@ public abstract class MPNode<T extends MPNode<T>> {
     // Transient cache for the parent node
     @Transient
     private T cachedParent;
+
+    private String generatePath(String parentPath, int index) {
+        String step = String.format("%04d", index);
+        return (parentPath == null ? "" : parentPath) + step;
+    }
+
+
+    // Method to add a root node
+    public static <T extends MPNode<T>> T addRoot(EntityManager em, T node, TreePathService treePathService) {
+        node.setPath(treePathService.getPath(null, 0));
+        node.setDepth(0);
+        node.setNumChild(0);
+        em.persist(node);
+        return node;
+    }
 
     /**
      * Retrieves the parent node.

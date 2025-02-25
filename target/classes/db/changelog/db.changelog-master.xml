@@ -238,4 +238,24 @@
         <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_roles" constraintName="user_roles_user_id_fk" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="users" validate="true"/>
     </changeSet>
 
+    <changeSet  author="Feroz" id="create_category_table">
+        <createTable tableName="category">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="category_pk" />
+            </column>
+            <column name="path" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="depth" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="numchild" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

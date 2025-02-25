@@ -5,7 +5,6 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.4.0</version>
 		<relativePath/>
-		<!--  lookup parent from repository  -->
 	</parent>
 	<groupId>com.ferozfaiz.spring-boot-api</groupId>
 	<artifactId>spring-boot-api</artifactId>

@@ -1,15 +1,19 @@
 package com.ferozfaiz.common.mptree;
 
+import org.springframework.stereotype.Service;
+
 /**
  * @author Feroz Faiz
  */
-public class PathUtil {
+
+@Service
+public class TreePathService {
 
     private static final String ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final int STEP_LENGTH = 4;
     private static final int BASE = ALPHABET.length();
 
-    public static String encode(int number, String alphabet, int length) {
+    public  String encode(int number, String alphabet, int length) {
         StringBuilder result = new StringBuilder();
         int base = alphabet.length();
         while (number > 0) {
@@ -22,7 +26,7 @@ public class PathUtil {
         return result.reverse().toString();
     }
 
-    public static String encode2(int number, String alphabet, int steplen) {
+    public  String encode2(int number, String alphabet, int steplen) {
         StringBuilder result = new StringBuilder();
         int base = alphabet.length();
 
@@ -41,7 +45,7 @@ public class PathUtil {
         return result.reverse().toString();
     }
 
-    public static String intToBase62(int number) {
+    public  String intToBase62(int number) {
         if (number < 0) {
             throw new IllegalArgumentException("Number must be non-negative.");
         }
@@ -55,7 +59,7 @@ public class PathUtil {
     }
 
     // todo: throw exception if num greater than alphabet.length()^STEP_LEN
-    public static String intToStr(int num, String alphabet) {
+    public  String intToStr(int num, String alphabet) {
         if (num == 0) return "0";
         int base = alphabet.length();
         StringBuilder sb = new StringBuilder();
@@ -67,13 +71,7 @@ public class PathUtil {
         return sb.toString();
     }
 
-    /**
-     * Converts a Base62 encoded string back to an integer.
-     *
-     * @param base62Str the Base62 encoded string
-     * @return the decoded integer
-     */
-    public static int base62ToInt(String base62Str) {
+    public  int base62ToInt(String base62Str) {
         int result = 0;
         for (char character : base62Str.toCharArray()) {
             result = result * BASE + ALPHABET.indexOf(character);
@@ -81,14 +79,14 @@ public class PathUtil {
         return result;
     }
 
-    public static String getPath(String parentPath, int stepNumber) {
+    public  String getPath(String parentPath, int stepNumber) {
         String encodedStep = intToBase62(stepNumber);
         // Pad the encoded step to ensure it matches the STEP_LENGTH
         String paddedStep = String.format("%" + STEP_LENGTH + "s", encodedStep).replace(' ', ALPHABET.charAt(0));
         return parentPath + paddedStep;
     }
 
-    public static String getPath(String basePath, int depth, int newStep) {
+    public  String getPath(String basePath, int depth, int newStep) {
         String parentPath = "";
         if (basePath != null && !basePath.isEmpty() && depth > 1) {
             int subLength = (depth - 1) * STEP_LENGTH;
