@@ -11,7 +11,7 @@ import java.util.List;
  * All tree-enabled models should extend this class.
  */
 @MappedSuperclass
-public abstract class MPNode<T extends MPNode<T>> {
+public abstract class MPNode {
 
 //    @Autowired
 //    private transient TreePathService treePathService;
@@ -82,7 +82,7 @@ public abstract class MPNode<T extends MPNode<T>> {
 
     // Transient cache for the parent node
     @Transient
-    private T cachedParent;
+    private MPNode cachedParent;
 
     private String generatePath(String parentPath, int index) {
         String step = String.format("%04d", index);
@@ -91,7 +91,7 @@ public abstract class MPNode<T extends MPNode<T>> {
 
 
     // Method to add a root node
-    public static <T extends MPNode<T>> T addRoot(EntityManager em, T node, TreePathService treePathService) {
+    public static MPNode addRoot(EntityManager em, MPNode node, TreePathService treePathService) {
         node.setPath(treePathService.getPath(null, 0));
         node.setDepth(0);
         node.setNumChild(0);
@@ -109,7 +109,7 @@ public abstract class MPNode<T extends MPNode<T>> {
      * @return the parent node of type T, or null if this is a root
      */
     @SuppressWarnings("unchecked")
-    public T getParent(EntityManager em, Boolean update) {
+    public MPNode getParent(EntityManager em, Boolean update) {
         if (this.getDepth() <= 1) {
             return null; // Root node has no parent
         }
@@ -122,11 +122,11 @@ public abstract class MPNode<T extends MPNode<T>> {
         // Compute parent's path by removing the last fixed-length segment
         String parentPath = this.getPath().substring(0, this.getPath().length() - STEPLEN);
         // Create a typed query using the runtime class, cast safely to Class<T>
-        TypedQuery<T> query = em.createQuery(
+        TypedQuery<MPNode> query = em.createQuery(
                 "SELECT n FROM " + this.getClass().getSimpleName() + " n WHERE n.path = :parentPath",
-                (Class<T>) this.getClass());
+                (Class<MPNode>) this.getClass());
         query.setParameter("parentPath", parentPath);
-        List<T> result = query.getResultList();
+        List<MPNode> result = query.getResultList();
         if (!result.isEmpty()) {
             cachedParent = result.get(0);
         }

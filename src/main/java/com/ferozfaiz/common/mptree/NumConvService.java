@@ -1,7 +1,10 @@
 package com.ferozfaiz.common.mptree;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,8 +16,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service
 public class NumConvService {
-
     private final NumConv numConv;
+
+    @Value("${app.package.mptree.step-length:4}")
+    private int STEPLEN;
+
+    private String alphabet;
 
     // Static cache to hold NumConv instances keyed by "radix:alphabet"
     private static final Map<String, NumConv> CACHE = new ConcurrentHashMap<>();
@@ -23,12 +30,9 @@ public class NumConvService {
         this.numConv = new NumConv();
     }
 
-    public NumConvService(int radix) {
+    @Autowired
+    public NumConvService(@Value("${app.package.mptree.radix:36}") int radix) {
         this.numConv = new NumConv(radix);
-    }
-
-    public NumConvService(int radix, String alphabet) {
-        this.numConv = new NumConv(radix, alphabet);
     }
 
     public String intToStr(long num) {
@@ -36,7 +40,6 @@ public class NumConvService {
     }
 
     public String intToStr(long num, int radix) {
-        // Use the default alphabet BASE85.
         return getCachedNumConv(radix, NumConv.BASE85).intToStr(num);
     }
 
@@ -49,7 +52,6 @@ public class NumConvService {
     }
 
     public long strToInt(String num, int radix) {
-        // Use the default alphabet BASE85.
         return getCachedNumConv(radix, NumConv.BASE85).strToInt(num);
     }
 
@@ -57,9 +59,10 @@ public class NumConvService {
         return getCachedNumConv(radix, alphabet).strToInt(num);
     }
 
-    /**
-     * Returns a cached NumConv instance for the specified radix and alphabet.
-     */
+    public String getAlphabet() {
+        return numConv.getAlphabet();
+    }
+
     private static NumConv getCachedNumConv(int radix, String alphabet) {
         String key = radix + ":" + alphabet;
         return CACHE.computeIfAbsent(key, k -> new NumConv(radix, alphabet));
@@ -89,7 +92,7 @@ public class NumConvService {
             this.radix = radix;
             this.alphabet = alphabet;
             // Build cachedMap and check for duplicate characters.
-            this.cachedMap = new ConcurrentHashMap<>();
+            this.cachedMap = new HashMap<>();
             for (int i = 0; i < alphabet.length(); i++) {
                 char c = alphabet.charAt(i);
                 if (cachedMap.containsKey(c)) {
@@ -151,7 +154,7 @@ public class NumConvService {
                     return Long.parseLong(num, radix);
                 } catch (NumberFormatException e) {
                     throw new IllegalArgumentException(
-                            String.format("invalid literal for strToInt() with radix %d: '%s'", radix, num), e);
+                            java.lang.String.format("invalid literal for strToInt() with radix %d: '%s'", radix, num), e);
                 }
             }
             long ret = 0;
@@ -161,11 +164,15 @@ public class NumConvService {
                 Integer value = cachedMap.get(c);
                 if (value == null || value >= radix) {
                     throw new IllegalArgumentException(
-                            String.format("invalid literal for strToInt() with radix %d: '%s'", radix, num));
+                            java.lang.String.format("invalid literal for strToInt() with radix %d: '%s'", radix, num));
                 }
                 ret = ret * radix + value;
             }
             return ret;
+        }
+
+        String getAlphabet() {
+            return alphabet;
         }
     }
 }
