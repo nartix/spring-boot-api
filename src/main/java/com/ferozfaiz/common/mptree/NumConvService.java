@@ -18,11 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NumConvService {
     private final NumConv numConv;
 
-    @Value("${app.package.mptree.step-length:4}")
-    private int STEPLEN;
-
-    private String alphabet;
-
     // Static cache to hold NumConv instances keyed by "radix:alphabet"
     private static final Map<String, NumConv> CACHE = new ConcurrentHashMap<>();
 

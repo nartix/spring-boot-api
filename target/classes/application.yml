@@ -109,3 +109,7 @@ management:
 app:
   default:
     timezone: ${TIMEZONE}
+  package:
+    mptree:
+      radix: 36
+      step-length: 4

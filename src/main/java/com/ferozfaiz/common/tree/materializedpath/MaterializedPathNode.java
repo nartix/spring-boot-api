@@ -1,17 +1,13 @@
-package com.ferozfaiz.common.mptree;
-
+package com.ferozfaiz.common.tree.materializedpath;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.MappedSuperclass;
 
 /**
- *  @author Feroz Faiz
- * An abstract base entity for materialized path trees.
- * All tree-enabled models should extend this class.
+ * @author Feroz Faiz
  */
 @MappedSuperclass
-public abstract class MPNode<T> {
+public abstract class MaterializedPathNode<T> {
 
     /**
      * The materialized path that represents this node's position in the tree.
@@ -35,10 +31,10 @@ public abstract class MPNode<T> {
     @Column(name = "numchild", nullable = false, columnDefinition = "int default 0")
     private int numChild;
 
-    public MPNode() {
+    public MaterializedPathNode() {
     }
 
-    public MPNode(String path, int depth, int numChild, String name, String description) {
+    public MaterializedPathNode(String path, int depth, int numChild, String name) {
         this.path = path;
         this.depth = depth;
         this.numChild = numChild;
@@ -69,16 +65,4 @@ public abstract class MPNode<T> {
     public void setNumChild(int numChild) {
         this.numChild = numChild;
     }
-
-    private String generatePath(String parentPath, int index) {
-        String step = String.format("%04d", index);
-        return (parentPath == null ? "" : parentPath) + step;
-    }
-
-    public Object getParent(EntityManager em, boolean b) {
-        return null;
-    }
 }
-
-
-

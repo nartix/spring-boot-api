@@ -249,13 +249,17 @@
             <column name="depth" type="INT">
                 <constraints nullable="false" />
             </column>
-            <column name="numchild" type="INT">
+            <column name="numchild" type="INT" defaultValue="0">
                 <constraints nullable="false" />
             </column>
+            <!-- not part of mptree package -->
             <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false" />
             </column>
         </createTable>
+        <createIndex tableName="category" indexName="category_path_idx" unique="true">
+            <column name="path" />
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>

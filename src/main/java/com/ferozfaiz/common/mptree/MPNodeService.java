@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 @Transactional
-public class MPService {
+public class MPNodeService<T extends MPNode<T>, ID> {
 
     @PersistenceContext
     private EntityManager em;
@@ -28,7 +28,6 @@ public class MPService {
 
     @Autowired
     private NumConvService numConvService;
-
 
     public String getBasePath(String path, int depth) {
         if (path != null && !path.isEmpty()) {
@@ -60,7 +59,7 @@ public class MPService {
      * Generates a path using an initial fixed segment (e.g. "0001"),
      * sets depth to 1 and initializes child count.
      */
-    public MPNode addRoot(MPNode node) {
+    public T addRoot(T node) {
         // Query existing root nodes (depth = 1) to get the highest path value.
         TypedQuery<String> query = em.createQuery(
                 "SELECT n.path FROM " + node.getClass().getSimpleName() + " n WHERE n.depth = 1 ORDER BY n.path DESC",
@@ -87,7 +86,7 @@ public class MPService {
      * Determines the next available child segment by examining parent's children,
      * concatenates parent's path with the new segment, sets depth, updates parent's child count, and persists.
      */
-    public MPNode addChild(MPNode parent, MPNode child) {
+    public T addChild(T parent, T child) {
         String parentPath = parent.getPath();
         int childDepth = parent.getDepth() + 1;
 
@@ -124,7 +123,7 @@ public class MPService {
      * Adds a sibling node to the given node.
      * For non-root nodes, uses the parent's path to calculate the next available segment.
      */
-    public MPNode addSibling(MPNode node, MPNode sibling) {
+    public T addSibling(T node, T sibling) {
         if (node.getDepth() == 1) {
             // Sibling for a root node is determined similarly to addRoot.
             TypedQuery<String> query = em.createQuery(
@@ -146,7 +145,7 @@ public class MPService {
             return sibling;
         } else {
             // For non-root nodes, sibling has the same parent.
-            MPNode parent = (MPNode) node.getParent(em, false);
+            T parent = (T) node.getParent(em, false);
             return addChild(parent, sibling);
         }
     }
@@ -156,7 +155,7 @@ public class MPService {
      * Computes a new path based on newParent's path, updates depth for the node and its descendants,
      * and adjusts parent's child counts. All operations are executed atomically.
      */
-    public void move(MPNode node, MPNode newParent) {
+    public void move(T node, T newParent) {
         // Prevent moving a node into one of its descendants.
         if (node.getPath().startsWith(newParent.getPath())) {
             throw new IllegalArgumentException("Cannot move a node to its descendant.");
@@ -183,13 +182,13 @@ public class MPService {
         String newPathPrefix = newParent.getPath() + formatSegment(nextSegment);
 
         // Retrieve all nodes in the subtree (node and descendants)
-        TypedQuery<MPNode> subtreeQuery = em.createQuery(
+        TypedQuery<T> subtreeQuery = em.createQuery(
                 "SELECT n FROM " + node.getClass().getSimpleName() + " n WHERE n.path LIKE :pattern",
-                (Class<MPNode>) node.getClass());
+                (Class<T>) node.getClass());
         subtreeQuery.setParameter("pattern", oldPath + "%");
-        List<MPNode> subtree = subtreeQuery.getResultList();
+        List<T> subtree = subtreeQuery.getResultList();
 
-        for (MPNode n : subtree) {
+        for (T n : subtree) {
             // Replace old path prefix with new path prefix
             String descendantSuffix = n.getPath().substring(oldPath.length());
             int depthDifference = n.getDepth() - node.getDepth();
@@ -199,7 +198,7 @@ public class MPService {
         }
 
         // Update parent's child counts
-        MPNode oldParent = (MPNode) node.getParent(em, false);
+        T oldParent = (T) node.getParent(em, false);
         if (oldParent != null) {
             oldParent.setNumChild(oldParent.getNumChild() - 1);
             em.merge(oldParent);
@@ -212,7 +211,7 @@ public class MPService {
      * Deletes a node and all its descendants from the tree.
      * Also updates the parent's numChild count accordingly.
      */
-    public void delete(MPNode node) {
+    public void delete(T node) {
         String pattern = node.getPath() + "%";
         // Bulk delete all nodes whose path starts with the given node's path.
         em.createQuery("DELETE FROM " + node.getClass().getSimpleName() + " n WHERE n.path LIKE :pattern")
@@ -220,7 +219,7 @@ public class MPService {
                 .executeUpdate();
 
         // Update parent's child count
-        MPNode parent = (MPNode) node.getParent(em, false);
+        T parent = (T) node.getParent(em, false);
         if (parent != null && parent.getNumChild() > 0) {
             parent.setNumChild(parent.getNumChild() - 1);
             em.merge(parent);
