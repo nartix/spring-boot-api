@@ -17,7 +17,6 @@ public class Category extends MaterializedPathNode<Category> {
     @Column(name = "name", nullable = false)
     private String name;
 
-
     public String getName() {
         return name;
     }
@@ -35,5 +34,14 @@ public class Category extends MaterializedPathNode<Category> {
     }
 
     public Category() {
+    }
+
+    public Category(String path, int depth, int numChild, String name) {
+        super(path, depth, numChild, name);
+        this.name = name;
+    }
+
+    public Category(String name) {
+        this.name = name;
     }
 }

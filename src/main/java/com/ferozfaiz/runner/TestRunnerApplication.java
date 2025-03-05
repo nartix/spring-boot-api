@@ -10,12 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.session.SessionAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
  * @author Feroz Faiz
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = {
+        org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
+        org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration.class,
+        SessionAutoConfiguration.class
+})
 @ComponentScan(basePackages =
         "com.ferozfaiz"
 )
@@ -38,12 +46,16 @@ public class TestRunnerApplication implements CommandLineRunner {
     }
 
     public void addData(int num) {
-        for(int i=0; i<num; i++) {
-            Category category = new Category();
-            category.setName("Category " + i +1);
-            category.setPath(categoryService.getPath("", 1, i+1));
-            category.setDepth(categoryService.getDepth(category.getPath()));
-            categoryRepository.save(category);
+        for(int i=1; i<=num; i++) {
+            Category rootNode = categoryService.addRoot(new Category("Category " + i));
+            for(int j=1; j<=10; j++) {
+                Category childNode = new Category("Category " + i + "." + j);
+                categoryService.addChild(rootNode, childNode);
+//                for(int k=1; k<=num; k++) {
+//                    Category grandChildNode = new Category("Category " + i + "." + j + "." + k);
+//                    categoryService.addChild(childNode, grandChildNode);
+//                }
+            }
         }
     }
 
@@ -59,13 +71,16 @@ public class TestRunnerApplication implements CommandLineRunner {
 //        logger.info("========= Path: {}", mpNodeService.getPath("", 1, 1000000));
 //        logger.info("============ test: {}",  String.format("%" + 4 + "s", "2"));
 
-        logger.info("============ intToStr 1000000: {}",  categoryService.intToStr(1000000));
-        logger.info("============ getDepth 0001000200030004: {}",  categoryService.getDepth("0001000200030004"));
-        logger.info("============ getPath 0001: {}",  categoryService.getPath("0001", 2, 2));
+        logger.info("============ intToStr 1000000: {}",  categoryService.getPathUtil().intToStr(1000000));
+        logger.info("============ getDepth 0001000200030004: {}",  categoryService.getPathUtil().getDepth("0001000200030004"));
+        logger.info("============ getPath 0001: {}",  categoryService.getPathUtil().getPath("0001", 2, 2));
 
         addData(40);
 
-        logger.info("============ get last root node: {}",  categoryRepository.findTopByDepthOrderByPathDesc(1).map(Category::getPath).orElse("Not Found"));
+//        logger.info("============ get last root node: {}",  categoryRepository.findTopByDepthOrderByPathDesc(1).map(Category::getPath).orElse("Not Found"));
+        logger.info("============ get last root node: {}", categoryRepository.findTopByDepthOrderByPathDesc(1)
+        .map(category -> "Path: " + category.getPath() + ", Name: " + category.getName() + ", Depth: " + category.getDepth())
+        .orElse("Not Found"));
 
         long executionTime = (System.currentTimeMillis() - startTime);
         logger.info("Time taken for calculation is : {} milliseconds", executionTime);

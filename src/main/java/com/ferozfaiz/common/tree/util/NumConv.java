@@ -110,4 +110,8 @@ public class NumConv implements NumConvInterface {
     public String getAlphabet() {
         return alphabet;
     }
+
+    public int getRadix() {
+        return radix;
+    }
 }

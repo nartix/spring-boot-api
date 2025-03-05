@@ -40,8 +40,6 @@ public abstract class MaterializedPathNode<T> {
         this.numChild = numChild;
     }
 
-    // No setter for id as it's generated
-
     public String getPath() {
         return path;
     }
