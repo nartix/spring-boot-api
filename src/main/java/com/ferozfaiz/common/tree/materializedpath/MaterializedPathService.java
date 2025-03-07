@@ -109,4 +109,26 @@ public abstract class MaterializedPathService<T extends MaterializedPathNode<T>,
         return addChild(parent, sibling);
     }
 
+    /**
+     * Deletes the given node and all its descendants.
+     */
+    @Transactional
+    public void delete(T node) {
+        Objects.requireNonNull(node, "delete error: Node cannot be null. A valid node is required.");
+
+        repository.deleteByPathStartingWith(node.getPath());
+
+        if (node.getDepth() == 1) {
+            return;
+        }
+
+        String parentPath = pathUtil.getBasePath(node.getPath(), node.getDepth() - 1);
+        T parent = repository.findByPath(parentPath)
+                .orElseThrow(() -> new IllegalArgumentException("delete error: Parent not found for node with path "
+                        + node.getPath() + ". Computed parent path: " + parentPath));
+        if (parent.getNumChild() > 0) {
+            parent.setNumChild(parent.getNumChild() - 1);
+            repository.save(parent);
+        }
+    }
 }

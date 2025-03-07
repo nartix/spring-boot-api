@@ -100,25 +100,6 @@ public class PathUtil {
         return parentPath + pad.toString() + key;
     }
 
-//    public  String getPath(String basePath, int depth, int newStep) {
-//        String parentPath = "";
-//        if (basePath != null && !basePath.isEmpty() && depth > 1) {
-//            int subLength = (depth - 1) * STEPLENGTH;
-//            // Ensure that the parent's path is long enough
-//            if (basePath.length() >= subLength) {
-//                parentPath = basePath.substring(0, subLength);
-//            }
-//        }
-//        String key = getNumConv().intToStr(newStep);
-//        // Pad the key with '0's to ensure a fixed length of STEP_LEN
-//        int padLength = STEPLENGTH - key.length();
-//        StringBuilder pad = new StringBuilder();
-//        for (int i = 0; i < padLength; i++) {
-//            pad.append(getNumConv().getAlphabet().charAt(0));
-//        }
-//        return parentPath +  pad.toString() + key;
-//    }
-
     public int getDepth(String path) {
         if (path == null || path.isEmpty()) return 0;
         if (path.length() % stepLength != 0) {

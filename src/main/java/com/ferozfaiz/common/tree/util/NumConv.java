@@ -90,7 +90,7 @@ public class NumConv implements NumConvInterface {
                 return Long.parseLong(num, radix);
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException(
-                        java.lang.String.format("invalid literal for strToInt() with radix %d: '%s'", radix, num), e);
+                        java.lang.String.format("Invalid literal for strToInt() with radix %d: '%s'", radix, num), e);
             }
         }
         long ret = 0;
@@ -100,7 +100,7 @@ public class NumConv implements NumConvInterface {
             Integer value = cachedMap.get(c);
             if (value == null || value >= radix) {
                 throw new IllegalArgumentException(
-                        java.lang.String.format("invalid literal for strToInt() with radix %d: '%s'", radix, num));
+                        java.lang.String.format("Invalid literal for strToInt() with radix %d: '%s'", radix, num));
             }
             ret = ret * radix + value;
         }

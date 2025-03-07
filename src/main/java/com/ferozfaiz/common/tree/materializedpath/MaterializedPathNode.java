@@ -14,7 +14,6 @@ public abstract class MaterializedPathNode<T> {
      * The path is built from fixed-width segments (e.g., 4-character segments).
      * Example: "0001", "00010001", etc.
      */
-
     @Column(name = "path", nullable = false, unique = true, length = 255)
     private String path;
 

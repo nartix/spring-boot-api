@@ -20,4 +20,6 @@ public interface MaterializedPathRepository <T extends MaterializedPathNode<T>, 
     Optional<T> findTopByDepthOrderByPathDesc(Integer depth);
 
     Optional<T> findTopByPathStartingWithAndDepthOrderByPathDesc(String prefix, Integer depth);
+
+    void deleteByPathStartingWith(String path);
 }

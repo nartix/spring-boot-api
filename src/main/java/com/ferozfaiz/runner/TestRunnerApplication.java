@@ -91,6 +91,11 @@ public class TestRunnerApplication implements CommandLineRunner {
         categoryService.addSibling(categoryRepository.findByPath("0001").orElse(null), new Category("Category Test"));
         categoryService.addSibling(categoryRepository.findByPath("00010001").orElse(null), new Category("Category Test"));
 
+        // delete root node and all its children
+        categoryService.delete(categoryRepository.findByPath("0004").orElse(null));
+        // delete child node and all its children
+        categoryService.delete(categoryRepository.findByPath("00010006").orElse(null));
+
 //        logger.info("============ get last child node: {}",  categoryRepository.findTopByPathStartingWithAndDepthOrderByPathDesc("0009", 2).map(Category::getPath).orElse("Not Found"));
 
 //        logger.info("============ get last root node: {}",  categoryRepository.findTopByDepthOrderByPathDesc(1).map(Category::getPath).orElse("Not Found"));
