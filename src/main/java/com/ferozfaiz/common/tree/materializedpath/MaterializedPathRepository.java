@@ -12,8 +12,12 @@ import java.util.Optional;
 @NoRepositoryBean
 public interface MaterializedPathRepository <T extends MaterializedPathNode<T>, ID>
         extends JpaRepository<T, ID> {
+    Optional<T> findByPath(String path);
+
     List<T> findByPathStartingWith(String prefix);
 
     // Find the top node by depth and order by path in descending order
     Optional<T> findTopByDepthOrderByPathDesc(Integer depth);
+
+    Optional<T> findTopByPathStartingWithAndDepthOrderByPathDesc(String prefix, Integer depth);
 }

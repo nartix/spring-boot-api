@@ -145,7 +145,29 @@ public class PathUtil {
                 : newParentPath + lastSegment;
     }
 
-    public double getStepLength() {
+    public int getStepLength() {
         return stepLength;
+    }
+
+    public String getFirstAncestor(String path) {
+        if (path == null || path.isEmpty()) {
+            throw new IllegalArgumentException("Path cannot be null or empty");
+        }
+        return path.substring(0, getStepLength());
+    }
+
+    public String getPathByDepth(String path, int depth) {
+        if (path == null || path.isEmpty()) {
+            throw new IllegalArgumentException("Path cannot be null or empty");
+        }
+        if (depth < 1) {
+            throw new IllegalArgumentException("Depth must be greater than 0");
+        }
+        int stepLength = getStepLength();
+        int pathEndLength = depth * stepLength;
+        if (path.length() < pathEndLength) {
+            throw new IllegalArgumentException("Path length is less than the expected step length");
+        }
+        return path.substring(pathEndLength - getStepLength(), pathEndLength);
     }
 }

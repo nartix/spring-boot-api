@@ -1,11 +1,15 @@
 package com.ferozfaiz.common.tree.materializedpath;
 
 import com.ferozfaiz.common.tree.util.PathUtil;
+import jakarta.transaction.Transactional;
+
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Feroz Faiz
  */
-public abstract class MaterializedPathService<T extends MaterializedPathNode<T>, ID > {
+public abstract class MaterializedPathService<T extends MaterializedPathNode<T>, ID> {
     private MaterializedPathRepository<T, ID> repository;
     private PathUtil pathUtil;
 
@@ -29,10 +33,9 @@ public abstract class MaterializedPathService<T extends MaterializedPathNode<T>,
         return pathUtil;
     }
 
+    @Transactional
     public T addRoot(T node) {
-        if (node == null) {
-            throw new IllegalArgumentException("Node cannot be null");
-        }
+        Objects.requireNonNull(node, "addRoot error: Node cannot be null. A valid node is required.");
 
         T lastNode = repository.findTopByDepthOrderByPathDesc(1).orElse(null);
 
@@ -45,7 +48,7 @@ public abstract class MaterializedPathService<T extends MaterializedPathNode<T>,
             if (newStep > maxStep) {
                 throw new IllegalArgumentException("Path length exceeded: current path " + lastNode.getPath() + ", maximum allowed path length " + maxStep);
             }
-            newPath = pathUtil.getPath(lastNode.getPath(), 1,  pathUtil.strToInt(lastNode.getPath()) + 1);
+            newPath = pathUtil.getPath(lastNode.getPath(), 1, newStep);
         }
 
         node.setPath(newPath);
@@ -56,30 +59,54 @@ public abstract class MaterializedPathService<T extends MaterializedPathNode<T>,
         return node;
     }
 
+    @Transactional
     public T addChild(T parent, T child) {
-        if (parent == null) {
-            throw new IllegalArgumentException("Parent cannot be null");
-        }
-        if (child == null) {
-            throw new IllegalArgumentException("Child cannot be null");
-        }
+        Objects.requireNonNull(parent, "addChild error: Parent node cannot be null. A valid parent is required.");
+        Objects.requireNonNull(child, "addChild error: Child node cannot be null. A valid child is required.");
 
-        long parentStep = pathUtil.strToInt(parent.getPath());
-        long newStep = parentStep + 1;
-        long maxStep = (long) Math.pow(pathUtil.getNumConv().getRadix(), pathUtil.getStepLength());
-        if (newStep > maxStep) {
-            throw new IllegalArgumentException("Path length exceeded: current path " + parent.getPath() + ", maximum allowed path length " + maxStep);
-        }
+        String parentPath = parent.getPath();
+        int childDepth = parent.getDepth() + 1;
 
-        String newPath = pathUtil.getPath(parent.getPath(), parent.getDepth() + 1, newStep);
+        // Get the last child path as an Optional
+        Optional<String> optionalLastChildPath = repository
+                .findTopByPathStartingWithAndDepthOrderByPathDesc(parentPath, childDepth)
+                .map(MaterializedPathNode::getPath);
+
+        // Compute new step using the Optional
+        long newStep = optionalLastChildPath
+                .map(lastChildPath -> {
+                    String lastDescendantPath = pathUtil.getPathByDepth(lastChildPath, childDepth);
+                    return pathUtil.strToInt(lastDescendantPath) + 1;
+                })
+                .orElse(1L);
+
+        // Create the new path and update the child node
+        String newPath = pathUtil.getPath(parentPath, childDepth, newStep);
         child.setPath(newPath);
-        child.setDepth(parent.getDepth() + 1);
+        child.setDepth(childDepth);
         child.setNumChild(0);
         repository.save(child);
 
+        // Update the parent node
         parent.setNumChild(parent.getNumChild() + 1);
         repository.save(parent);
 
         return child;
     }
+
+    @Transactional
+    public T addSibling(T node, T sibling) {
+        Objects.requireNonNull(node, "addSibling error: Reference node cannot be null, a valid node is required.");
+        Objects.requireNonNull(sibling, "addSibling error: Sibling node cannot be null, a valid sibling is required.");
+
+        if (node.getDepth() == 1) {
+            return addRoot(sibling);
+        }
+        String parentPath = pathUtil.getBasePath(node.getPath(), node.getDepth() - 1);
+        T parent = repository.findByPath(parentPath)
+                .orElseThrow(() -> new IllegalArgumentException("addSibling error: Parent not found for node with path "
+                        + node.getPath() + ". Computed parent path: " + parentPath));
+        return addChild(parent, sibling);
+    }
+
 }
