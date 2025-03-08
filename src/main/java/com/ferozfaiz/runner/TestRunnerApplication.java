@@ -59,10 +59,9 @@ public class TestRunnerApplication implements CommandLineRunner {
 //                categoryRepository.save(childNode);
                 categoryService.addChild(rootNode, childNode);
 
-//                for(int k=1; k<=num; k++) {
-//                    Category grandChildNode = new Category("Category " + i + "." + j + "." + k);
-//                    categoryService.addChild(childNode, grandChildNode);
-//                }
+                for(int k=1; k<=5; k++) {
+                    categoryService.addChild(childNode, new Category("Category " + i + "." + j + "." + k));
+                }
             }
         }
     }
@@ -83,18 +82,40 @@ public class TestRunnerApplication implements CommandLineRunner {
 //        logger.info("============ getDepth 0001000200030004: {}",  categoryService.getPathUtil().getDepth("0001000200030004"));
 //        logger.info("============ getPath 0001: {}",  categoryService.getPathUtil().getPath("0001", 2, 2));
 
-        logger.info("============ get path at depth ?: {}",  categoryService.getPathUtil().getPathByDepth("00010002000A", 3));
+//        logger.info("============ get path at depth ?: {}",  categoryService.getPathUtil().getPathByDepth("00010002000A", 3));
 //        logger.info("============ get strToInt \"\" test: {}",  categoryService.getPathUtil().strToInt(""));
 //        logger.info("============ get strToInt null test: {}",  categoryService.getPathUtil().strToInt(null));
 
         addData(5);
-        categoryService.addSibling(categoryRepository.findByPath("0001").orElse(null), new Category("Category Test"));
-        categoryService.addSibling(categoryRepository.findByPath("00010001").orElse(null), new Category("Category Test"));
+        categoryService.addSibling(categoryRepository.findByPath("0001").orElse(null), new Category("Category Sibling Test Root"));
+        categoryService.addSibling(categoryRepository.findByPath("00010001").orElse(null), new Category("Category Sibling Test Root/Child"));
 
         // delete root node and all its children
         categoryService.delete(categoryRepository.findByPath("0004").orElse(null));
         // delete child node and all its children
         categoryService.delete(categoryRepository.findByPath("00010006").orElse(null));
+
+        // move node in the same level
+//        categoryService.move(categoryRepository.findByPath("00020001").orElse(null), categoryRepository.findByPath("00020002").orElse(null));
+
+        // move node to a different level
+//        categoryService.move(categoryRepository.findByPath("00020001").orElse(null), categoryRepository.findByPath("00030001").orElse(null));
+
+        // move a root node to a different level
+//        categoryService.move(categoryRepository.findByPath("0001").orElse(null), categoryRepository.findByPath("0005").orElse(null));
+
+        // move a child node to the root level
+//        categoryService.move(categoryRepository.findByPath("00010001").orElse(null), categoryRepository.findByPath("0006").orElse(null));
+
+        // move a third level node to the root level
+//        categoryService.move(categoryRepository.findByPath("000100020003").orElse(null), categoryRepository.findByPath("0006").orElse(null));
+
+        // move a root node to its child node, will throw an exception
+//        categoryService.move(categoryRepository.findByPath("0001").orElse(null), categoryRepository.findByPath("00010001").orElse(null));
+
+        // move a root node to the third level
+        categoryService.move(categoryRepository.findByPath("0002").orElse(null), categoryRepository.findByPath("000100020003").orElse(null));
+
 
 //        logger.info("============ get last child node: {}",  categoryRepository.findTopByPathStartingWithAndDepthOrderByPathDesc("0009", 2).map(Category::getPath).orElse("Not Found"));
 

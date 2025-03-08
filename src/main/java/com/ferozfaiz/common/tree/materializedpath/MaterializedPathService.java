@@ -131,4 +131,100 @@ public abstract class MaterializedPathService<T extends MaterializedPathNode<T>,
             repository.save(parent);
         }
     }
+
+    // working but not efficient
+//    @Transactional
+//    public void move(T node, T newParent) {
+//        Objects.requireNonNull(node, "move error: Node cannot be null. A valid node is required.");
+//        Objects.requireNonNull(newParent, "move error: New parent cannot be null. A valid new parent is required.");
+//
+//        if (pathUtil.isAncestor(node.getPath(), newParent.getPath())) {
+//            throw new IllegalArgumentException("move error: Cannot move node with path " + node.getPath() + " to its descendant with path " + newParent.getPath() + ".");
+//        }
+//
+//        String oldPath = node.getPath();
+//        String newParentPath = newParent.getPath();
+//        int newDepth = newParent.getDepth() + 1;
+//
+//        // Compute new path for the node under the new parent
+//        Optional<T> lastSibling = repository.findTopByPathStartingWithAndDepthOrderByPathDesc(newParentPath, newDepth);
+//        long newStep = lastSibling
+//                .map(sibling -> pathUtil.strToInt(pathUtil.getPathByDepth(sibling.getPath(), newDepth)) + 1)
+//                .orElse(1L);
+//
+//        String newPath = pathUtil.getPath(newParentPath, newDepth, newStep);
+//        int pathDiff = newPath.length() - oldPath.length();
+//
+//        // Fetch all descendants of the node being moved
+//        List<T> descendants = repository.findByPathStartingWith(oldPath);
+//
+//        // Update path and depth of node and descendants
+//        for (T descendant : descendants) {
+//            String descendantOldPath = descendant.getPath();
+//            String descendantNewPath = newPath + descendantOldPath.substring(oldPath.length());
+//
+//            descendant.setPath(descendantNewPath);
+//            descendant.setDepth(newDepth + ((descendantOldPath.length() - oldPath.length()) / pathUtil.getStepLength()));
+//            repository.save(descendant);
+//        }
+//
+//        // Update old parent's numChild
+//        if (node.getDepth() > 1) {
+//            String oldParentPath = pathUtil.getBasePath(oldPath, node.getDepth() - 1);
+//            repository.findByPath(oldParentPath).ifPresent(oldParent -> {
+//                oldParent.setNumChild(Math.max(0, oldParent.getNumChild() - 1));
+//                repository.save(oldParent);
+//            });
+//        }
+//
+//        // Update new parent's numChild
+//        newParent.setNumChild(newParent.getNumChild() + 1);
+//        repository.save(newParent);
+//    }
+
+    @Transactional
+    public void move(T node, T newParent) {
+        Objects.requireNonNull(node, "move error: Node cannot be null. A valid node is required.");
+        Objects.requireNonNull(newParent, "move error: New parent cannot be null. A valid new parent is required.");
+
+        if (pathUtil.isAncestor(node.getPath(), newParent.getPath())) {
+            throw new IllegalArgumentException("move error: Cannot move node with path " + node.getPath() + " to its descendant with path " + newParent.getPath() + ".");
+        }
+
+        String oldPath = node.getPath();
+        String newParentPath = newParent.getPath();
+        int newDepth = newParent.getDepth() + 1;
+
+        // Compute new path for the node
+        Optional<T> lastSibling = repository.findTopByPathStartingWithAndDepthOrderByPathDesc(newParentPath, newDepth);
+        long newStep = lastSibling
+                .map(sibling -> pathUtil.strToInt(pathUtil.getPathByDepth(sibling.getPath(), newDepth)) + 1)
+                .orElse(1L);
+
+        String newPath = pathUtil.getPath(newParentPath, newDepth, newStep);
+
+        // Compute difference in length to calculate new depth
+        int depthDiff = newDepth - node.getDepth();
+        int oldPathLength = oldPath.length();
+
+        // Perform bulk update for paths and depths in a single query
+        repository.bulkUpdatePathsAndDepth(oldPath, newPath, oldPathLength, depthDiff, pathUtil.getStepLength());
+
+        // Update numChild counts of parents
+        updateParentChildCountsAfterMove(node, newParent);
+    }
+
+    // Helper to update numChild counts
+    private void updateParentChildCountsAfterMove(T node, T newParent) {
+        // Decrement old parent numChild
+        if (node.getDepth() > 1) {
+            String oldParentPath = pathUtil.getBasePath(node.getPath(), node.getDepth() - 1);
+            repository.decrementNumChildByPath(oldParentPath);
+        }
+
+        // Increment new parent numChild
+        repository.incrementNumChildByPath(newParent.getPath());
+    }
+
+
 }
