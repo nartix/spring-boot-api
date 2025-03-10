@@ -114,8 +114,19 @@ public class TestRunnerApplication implements CommandLineRunner {
 //        categoryService.move(categoryRepository.findByPath("0001").orElse(null), categoryRepository.findByPath("00010001").orElse(null));
 
         // move a root node to the third level
-        categoryService.move(categoryRepository.findByPath("0002").orElse(null), categoryRepository.findByPath("000100020003").orElse(null));
+//        categoryService.move(categoryRepository.findByPath("0002").orElse(null), categoryRepository.findByPath("000100020003").orElse(null));
 
+//        // testing path overflow
+//        // JPA will throws DataIntegrityViolationException when path exceeds 255 characters
+//        categoryRepository.findByPath("0006").ifPresent(category -> {
+//            category.setPath("000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001");
+//            category.setDepth(63);
+//            categoryRepository.save(category);
+//        });
+//        categoryService.move(categoryRepository.findByPath("000500050005").orElse(null), categoryRepository.findByPath("000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001").orElse(null));
+
+
+//       String pathtest =  categoryService.getPathUtil().getPath()
 
 //        logger.info("============ get last child node: {}",  categoryRepository.findTopByPathStartingWithAndDepthOrderByPathDesc("0009", 2).map(Category::getPath).orElse("Not Found"));
 

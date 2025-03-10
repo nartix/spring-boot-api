@@ -130,6 +130,10 @@ public class PathUtil {
         return stepLength;
     }
 
+    public long getMaxStepLength() {
+        return (long) Math.pow(getNumConv().getRadix(), stepLength);
+    }
+
     public String getFirstAncestor(String path) {
         if (path == null || path.isEmpty()) {
             throw new IllegalArgumentException("Path cannot be null or empty");

@@ -14,7 +14,7 @@ public class Category extends MaterializedPathNode<Category> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 255)
     private String name;
 
     public String getName() {
@@ -43,5 +43,9 @@ public class Category extends MaterializedPathNode<Category> {
 
     public Category(String name) {
         this.name = name;
+    }
+
+    public static int getPathColumnLength() {
+        return 300;
     }
 }

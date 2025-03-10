@@ -44,9 +44,8 @@ public abstract class MaterializedPathService<T extends MaterializedPathNode<T>,
             newPath = pathUtil.getPath(null, 1, 1);
         } else {
             long newStep = pathUtil.strToInt(lastNode.getPath()) + 1;
-            long maxStep = (long) Math.pow(pathUtil.getNumConv().getRadix(), pathUtil.getStepLength());
-            if (newStep > maxStep) {
-                throw new IllegalArgumentException("Path length exceeded: current path " + lastNode.getPath() + ", maximum allowed path length " + maxStep);
+            if (newStep > pathUtil.getMaxStepLength()) {
+                throw new IllegalArgumentException("Path length exceeded: current path " + lastNode.getPath() + ", maximum allowed path length " + pathUtil.getMaxStepLength());
             }
             newPath = pathUtil.getPath(lastNode.getPath(), 1, newStep);
         }
@@ -79,6 +78,10 @@ public abstract class MaterializedPathService<T extends MaterializedPathNode<T>,
                     return pathUtil.strToInt(lastDescendantPath) + 1;
                 })
                 .orElse(1L);
+
+        if (newStep > pathUtil.getMaxStepLength()) {
+            throw new IllegalArgumentException("Path length exceeded: current path " + parentPath + ", maximum allowed path length " + pathUtil.getMaxStepLength());
+        }
 
         // Create the new path and update the child node
         String newPath = pathUtil.getPath(parentPath, childDepth, newStep);
@@ -182,6 +185,10 @@ public abstract class MaterializedPathService<T extends MaterializedPathNode<T>,
 //        repository.save(newParent);
 //    }
 
+    /**
+     * Moves the given node to a new parent node.
+     * DataIntegrityViolationException is thrown if path length exceeds the maximum allowed path length.
+     */
     @Transactional
     public void move(T node, T newParent) {
         Objects.requireNonNull(node, "move error: Node cannot be null. A valid node is required.");
@@ -226,5 +233,8 @@ public abstract class MaterializedPathService<T extends MaterializedPathNode<T>,
         repository.incrementNumChildByPath(newParent.getPath());
     }
 
+    public int getPathColumnLength() {
+        return MaterializedPathNode.getPathColumnLength();
+    }
 
 }

@@ -17,6 +17,10 @@ public abstract class MaterializedPathNode<T> {
     @Column(name = "path", nullable = false, unique = true, length = 255)
     private String path;
 
+    public static int getPathColumnLength() {
+        return 255;
+    }
+
     /**
      * The depth (level) of the node in the tree.
      * This is calculated as the number of segments in the path.
