@@ -3,12 +3,21 @@ package com.ferozfaiz.common.tree.util;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  * @author Feroz Faiz
  */
 public class PathUtilTest {
     // Use default constructor (NumConv(36,BASE36) and stepLength=4)
     private final PathUtil pathUtil = new PathUtil();
+
+    @Test
+    void testConstructorValidation() {
+        assertThrows(IllegalArgumentException.class, () -> new PathUtil(null, 4));
+        assertThrows(IllegalArgumentException.class, () -> new PathUtil(new NumConv(10, "0123456789"), 0));
+    }
+
 
     @Test
     void testIntToStrAndStrToInt() {
@@ -48,7 +57,7 @@ public class PathUtilTest {
 
         // Path length not a multiple of stepLength should throw an exception
         String invalidPath = "0001000";
-        Assertions.assertThrows(IllegalArgumentException.class, () -> pathUtil.getDepth(invalidPath));
+        assertThrows(IllegalArgumentException.class, () -> pathUtil.getDepth(invalidPath));
     }
 
     @Test
@@ -94,7 +103,7 @@ public class PathUtilTest {
         Assertions.assertEquals("0001", firstAncestor);
 
         // Passing an empty path should throw an exception.
-        Assertions.assertThrows(IllegalArgumentException.class, () -> pathUtil.getFirstAncestor(""));
+        assertThrows(IllegalArgumentException.class, () -> pathUtil.getFirstAncestor(""));
     }
 
     @Test
@@ -105,6 +114,6 @@ public class PathUtilTest {
         Assertions.assertEquals("0002", segment);
 
         // Requesting a segment beyond the length should throw an exception.
-        Assertions.assertThrows(IllegalArgumentException.class, () -> pathUtil.getPathByDepth(path, 4));
+        assertThrows(IllegalArgumentException.class, () -> pathUtil.getPathByDepth(path, 4));
     }
 }

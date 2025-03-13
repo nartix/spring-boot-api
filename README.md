@@ -2,7 +2,7 @@
 
 ## About the Project
 
-I developed this Spring Boot API for use with a Next.js application that’s currently under development. The API relies on PostgreSQL as the primary database, is secured through OpenID Connect, and leverages Hashicorp Vault for secret management. The application is deployed on a self-managed Kubernetes cluster.
+I developed this Spring Boot API, relying on PostgreSQL as the primary database. It is secured through OpenID Connect, leverages Hashicorp Vault for secret management, and is deployed on a self-managed Kubernetes cluster. Additionally, I designed and implemented a [materialized path](https://github.com/nartix/spring-boot-api/tree/main/src/main/java/com/ferozfaiz/common/tree) data hierarchy for use with Spring Data JPA, based on the Python Treebeard package.
 
 Live Demo: <a href='https://spring-boot-api.ferozfaiz.com/swagger-ui.html' target='_blank'>spring-boot-api.ferozfaiz.com</a>
 

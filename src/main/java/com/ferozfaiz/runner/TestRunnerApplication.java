@@ -126,6 +126,13 @@ public class TestRunnerApplication implements CommandLineRunner {
 //        categoryService.move(categoryRepository.findByPath("000500050005").orElse(null), categoryRepository.findByPath("000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001").orElse(null));
 
 
+        Category root1 = categoryService.addRoot(new Category("Root1"));
+        Category root2 = categoryService.addRoot(new Category("Root2"));
+        Category child1 = categoryService.addChild(root1, new Category("Child1"));
+
+        // Move child1 from root1 to root2
+        categoryService.move(child1, root2);
+
 //       String pathtest =  categoryService.getPathUtil().getPath()
 
 //        logger.info("============ get last child node: {}",  categoryRepository.findTopByPathStartingWithAndDepthOrderByPathDesc("0009", 2).map(Category::getPath).orElse("Not Found"));
