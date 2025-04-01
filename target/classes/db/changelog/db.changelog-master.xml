@@ -44,6 +44,16 @@
                 <constraints nullable="true"/>
             </column>
         </createTable>
+
+        <addUniqueConstraint
+                columnNames="email"
+                constraintName="user_email_uk"
+                tableName="users" />
+
+        <addUniqueConstraint
+                columnNames="username"
+                constraintName="user_username_uk"
+                tableName="users" />
     </changeSet>
 
     <changeSet author="Feroz" id="create_roles_table">
@@ -55,6 +65,11 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+        <addUniqueConstraint
+                columnNames="name"
+                constraintName="roles_name_uk"
+                tableName="roles" />
     </changeSet>
 
     <changeSet author="Feroz" id="create_permissions_table">
@@ -66,6 +81,11 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+        <addUniqueConstraint
+                columnNames="name"
+                constraintName="permissions_name_uk"
+                tableName="permissions" />
     </changeSet>
 
     <!-- Association Table Creations -->
@@ -78,6 +98,29 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="roles_permissions_pk"/>
             </column>
         </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="role_id"
+                baseTableName="roles_permissions"
+                constraintName="roles_permissions_role_id_fk"
+                deferrable="false" initiallyDeferred="false"
+                onDelete="NO ACTION" onUpdate="NO ACTION"
+                referencedColumnNames="id"
+                referencedTableName="roles"
+                validate="true" />
+
+        <addForeignKeyConstraint
+                baseColumnNames="permission_id"
+                baseTableName="roles_permissions"
+                constraintName="roles_permissions_permission_id_fk"
+                deferrable="false"
+                initiallyDeferred="false"
+                onDelete="NO ACTION"
+                onUpdate="NO ACTION"
+                referencedColumnNames="id"
+                referencedTableName="permissions"
+                validate="true" />
+
     </changeSet>
 
     <changeSet author="Feroz" id="create_spring_session_table">
@@ -198,45 +241,37 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="user_roles_pk"/>
             </column>
         </createTable>
-    </changeSet>
 
-    <!-- Unique Constraints -->
-    <changeSet author="Feroz" id="add_unique_constraint_email_users">
-        <addUniqueConstraint columnNames="email" constraintName="user_email_uk" tableName="users"/>
-    </changeSet>
+        <addForeignKeyConstraint
+                baseColumnNames="role_id"
+                baseTableName="user_roles"
+                constraintName="user_roles_role_id_fk"
+                deferrable="false"
+                initiallyDeferred="false"
+                onDelete="NO ACTION"
+                onUpdate="NO ACTION"
+                referencedColumnNames="id"
+                referencedTableName="roles"
+                validate="true" />
 
-    <changeSet author="Feroz" id="add_unique_constraint_username_users">
-        <addUniqueConstraint columnNames="username" constraintName="user_username_uk" tableName="users"/>
-    </changeSet>
+        <addForeignKeyConstraint
+                baseColumnNames="user_id"
+                baseTableName="user_roles"
+                constraintName="user_roles_user_id_fk"
+                deferrable="false"
+                initiallyDeferred="false"
+                onDelete="NO ACTION"
+                onUpdate="NO ACTION"
+                referencedColumnNames="id"
+                referencedTableName="users"
+                validate="true" />
 
-    <changeSet author="Feroz" id="add_unique_constraint_name_roles">
-        <addUniqueConstraint columnNames="name" constraintName="roles_name_uk" tableName="roles"/>
-    </changeSet>
 
-    <changeSet author="Feroz" id="add_unique_constraint_name_permissions">
-        <addUniqueConstraint columnNames="name" constraintName="permissions_name_uk" tableName="permissions"/>
-    </changeSet>
-
-    <!-- Foreign Key Constraints -->
-    <changeSet author="Feroz" id="add_fk_constraint_permission_id_roles_permissions">
-        <addForeignKeyConstraint baseColumnNames="permission_id" baseTableName="roles_permissions" constraintName="roles_permissions_permission_id_fk" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="permissions" validate="true"/>
-    </changeSet>
-
-    <changeSet author="Feroz" id="add_fk_constraint_role_id_roles_permissions">
-        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="roles_permissions" constraintName="roles_permissions_role_id_fk" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="roles" validate="true"/>
     </changeSet>
 
 <!--    <changeSet author="Feroz" id="add_fk_constraint_session_primary_id_spring_session_attributes">-->
 <!--        <addForeignKeyConstraint baseColumnNames="session_primary_id" baseTableName="spring_session_attributes" constraintName="spring_session_attributes_fk" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="primary_id" referencedTableName="spring_session" validate="true"/>-->
 <!--    </changeSet>-->
-
-    <changeSet author="Feroz" id="add_fk_constraint_role_id_user_roles">
-        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="user_roles" constraintName="user_roles_role_id_fk" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="roles" validate="true"/>
-    </changeSet>
-
-    <changeSet author="Feroz" id="add_fk_constraint_user_id_user_roles">
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_roles" constraintName="user_roles_user_id_fk" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="users" validate="true"/>
-    </changeSet>
 
     <changeSet  author="Feroz" id="create_category_table">
         <createTable tableName="category">
@@ -260,6 +295,298 @@
         <createIndex tableName="category" indexName="category_path_idx" unique="true">
             <column name="path" />
         </createIndex>
+        <createIndex tableName="category" indexName="category_name_idx">
+            <column name="name" />
+        </createIndex>
     </changeSet>
 
+
+    <!-- Product changesets -->
+    <changeSet id="create_product_category_table" author="Feroz">
+        <createTable tableName="product_category">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="path" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="depth" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="numchild" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+        </createTable>
+
+        <createIndex indexName="idx_product_category_name" tableName="product_category" >
+            <column name="name"/>
+        </createIndex>
+        <createIndex indexName="idx_product_category_path" tableName="product_category" >
+            <column name="path"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="create_product_manufacturer_table" author="Feroz">
+        <createTable tableName="product_manufacturer">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex indexName="product_manufacturer_name_idx" tableName="product_manufacturer">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="create_product_brand_table" author="Universal Liberator">
+        <createTable tableName="product_brand">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex indexName="product_brand_name_idx" tableName="product_brand">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="create_product_measurementunit_table" author="Feroz">
+        <createTable tableName="product_measurementunit">
+            <column name="measurement_unit_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="symbol" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="conversion_factor" type="FLOAT"/>
+        </createTable>
+
+        <createIndex indexName="product_measurementunit_name_idx" tableName="product_measurementunit">
+            <column name="name"/>
+        </createIndex>
+        <createIndex indexName="product_measurementunit_symbol_idx" tableName="product_measurementunit">
+            <column name="symbol"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="create_product_attribute_table" author="Feroz">
+        <createTable tableName="product_attribute">
+            <column name="attribute_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="data_type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex indexName="product_attribute_name_idx" tableName="product_attribute">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="create_product_attributevalue_table" author="Feroz">
+        <createTable tableName="product_attributevalue">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="attribute_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value_string" type="VARCHAR(255)"/>
+            <column name="value_numeric" type="FLOAT"/>
+            <column name="value_boolean" type="BOOLEAN"/>
+            <column name="measurement_unit_id" type="INT"/>
+        </createTable>
+        <createIndex indexName="product_attributevalue_attribute_idx" tableName="product_attributevalue">
+            <column name="attribute_id"/>
+        </createIndex>
+        <addForeignKeyConstraint
+                baseTableName="product_attributevalue"
+                baseColumnNames="attribute_id"
+                constraintName="fk_product_attributevalue_attribute"
+                referencedTableName="product_attribute"
+                referencedColumnNames="attribute_id"
+                onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+                baseTableName="product_attributevalue"
+                baseColumnNames="measurement_unit_id"
+                constraintName="fk_product_attributevalue_measurement_unit"
+                referencedTableName="product_measurementunit"
+                referencedColumnNames="id"
+                onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet id="create_product_productattribute_table" author="Feroz">
+        <createTable tableName="product_productattribute">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="product_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attribute_value" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                tableName="product_productattribute"
+                columnNames="product_id, attribute_value"
+                constraintName="uq_product_productattribute_product_attribute_value" />
+        <createIndex indexName="product_productattribute_product_attribute_value_idx" tableName="product_productattribute">
+            <column name="product_id"/>
+            <column name="attribute_value"/>
+        </createIndex>
+        <addForeignKeyConstraint
+                baseTableName="product_productattribute"
+                baseColumnNames="product_id"
+                constraintName="fk_product_productattribute_product"
+                referencedTableName="product_product"
+                referencedColumnNames="id"
+                onDelete="CASCADE" />
+        <addForeignKeyConstraint
+                baseTableName="product_productattribute"
+                baseColumnNames="attribute_value"
+                constraintName="fk_product_productattribute_attributevalue"
+                referencedTableName="product_attributevalue"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="create_product_product_category_table" author="Feroz">
+        <createTable tableName="product_product_category">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="product_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                tableName="product_product_category"
+                columnNames="product_id, category_id"
+                constraintName="uq_product_product_category_product_category"/>
+        <createIndex indexName="product_product_category_product_category_idx" tableName="product_product_category">
+            <column name="product_id"/>
+            <column name="category_id"/>
+        </createIndex>
+        <addForeignKeyConstraint
+                baseTableName="product_product_category"
+                baseColumnNames="product_id"
+                constraintName="fk_product_product_category_product"
+                referencedTableName="product_product"
+                referencedColumnNames="id"
+                onDelete="CASCADE" />
+        <addForeignKeyConstraint
+                baseTableName="product_product_category"
+                baseColumnNames="category_id"
+                constraintName="fk_product_product_category_category"
+                referencedTableName="product_category"
+                referencedColumnNames="id"
+                onDelete="CASCADE" />
+    </changeSet>
+
+    <changeSet id="create_product_productpricehistory_table" author="Feroz">
+        <createTable tableName="product_productpricehistory">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="product_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="DATETIME"/>
+            <column name="is_current" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex indexName="product_productpricehistory_product_start_date_idx" tableName="product_productpricehistory">
+            <column name="product_id"/>
+            <column name="start_date" descending="true"/>
+        </createIndex>
+        <createIndex indexName="product_productpricehistory_is_current_idx" tableName="product_productpricehistory">
+            <column name="is_current"/>
+        </createIndex>
+        <addForeignKeyConstraint
+                baseTableName="product_productpricehistory"
+                baseColumnNames="product_id"
+                constraintName="fk_product_productpricehistory_product"
+                referencedTableName="product_product"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="create_product_product_table" author="Feroz">
+        <createTable tableName="product_product">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="base_price" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+<!--            <column name="image_url" type="VARCHAR(200)"/>-->
+            <column name="view_count" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slug" type="VARCHAR(255)"/>
+            <column name="brand_id" type="INT"/>
+            <column name="manufacturer_id" type="INT"/>
+        </createTable>
+        <createIndex indexName="product_product_name_idx" tableName="product_product">
+            <column name="name"/>
+        </createIndex>
+        <createIndex indexName="product_product_slug_idx" tableName="product_product">
+            <column name="slug"/>
+        </createIndex>
+        <createIndex indexName="product_product_base_price_idx" tableName="product_product">
+            <column name="base_price"/>
+        </createIndex>
+        <createIndex indexName="product_product_is_active_idx" tableName="product_product">
+            <column name="is_active"/>
+        </createIndex>
+        <addForeignKeyConstraint
+                baseTableName="product_product"
+                baseColumnNames="brand_id"
+                constraintName="fk_product_product_brand"
+                referencedTableName="product_brand"
+                referencedColumnNames="id"
+                onDelete="SET NULL"/>
+        <addForeignKeyConstraint
+                baseTableName="product_product"
+                baseColumnNames="manufacturer_id"
+                constraintName="fk_product_product_manufacturer"
+                referencedTableName="product_manufacturer"
+                referencedColumnNames="id"
+                onDelete="SET NULL"/>
+    </changeSet>
 </databaseChangeLog>

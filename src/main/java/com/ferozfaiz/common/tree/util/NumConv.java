@@ -2,6 +2,7 @@ package com.ferozfaiz.common.tree.util;
 
 import java.util.HashMap;
 import java.util.Map;
+
 /**
  * @author Feroz Faiz
  * Ported from the Python version of the code.
