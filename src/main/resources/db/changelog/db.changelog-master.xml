@@ -362,7 +362,7 @@
 
     <changeSet id="create_product_measurementunit_table" author="Feroz">
         <createTable tableName="product_measurementunit">
-            <column name="measurement_unit_id" type="INT" autoIncrement="true">
+            <column name="id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="VARCHAR(50)">
@@ -384,7 +384,7 @@
 
     <changeSet id="create_product_attribute_table" author="Feroz">
         <createTable tableName="product_attribute">
-            <column name="attribute_id" type="INT" autoIncrement="true">
+            <column name="id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="VARCHAR(255)">
@@ -421,7 +421,7 @@
                 baseColumnNames="attribute_id"
                 constraintName="fk_product_attributevalue_attribute"
                 referencedTableName="product_attribute"
-                referencedColumnNames="attribute_id"
+                referencedColumnNames="id"
                 onDelete="CASCADE"/>
         <addForeignKeyConstraint
                 baseTableName="product_attributevalue"
