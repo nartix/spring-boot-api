@@ -6,7 +6,8 @@ import jakarta.persistence.*;
 /**
  * @author Feroz Faiz
  */
-@Table(name = "product_category", schema = "products", indexes = {
+@Entity
+@Table(name = "product_category", indexes = {
         @Index(columnList = "name"),
         @Index(columnList = "path")
 })
