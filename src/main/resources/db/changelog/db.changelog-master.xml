@@ -293,7 +293,7 @@
     <!-- Product changesets -->
     <changeSet id="create_product_category_table" author="Feroz">
         <createTable tableName="product_category">
-            <column name="id" type="INT" autoIncrement="true">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="path" type="VARCHAR(255)">
