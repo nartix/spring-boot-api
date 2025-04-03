@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
  * @author Feroz Faiz
  */
 @Repository
-public interface CategoryRepository extends MaterializedPathRepository<Category, Long> {
+public interface ProductCategoryRepository extends MaterializedPathRepository<ProductCategory, Long> {
 }

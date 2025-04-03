@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
  * @author Feroz Faiz
  */
 @Service
-public class CategoryService extends MaterializedPathService<Category, Long> {
+public class ProductCategoryService extends MaterializedPathService<ProductCategory, Long> {
     @Autowired
-    public CategoryService(CategoryRepository repository) {
+    public ProductCategoryService(ProductCategoryRepository repository) {
         super(repository);
     }
 }

@@ -6,11 +6,11 @@ import jakarta.persistence.*;
 /**
  * @author Feroz Faiz
  */
-@Table(name = "products_category", schema = "products", indexes = {
+@Table(name = "product_category", schema = "products", indexes = {
         @Index(columnList = "name"),
         @Index(columnList = "path")
 })
-public class Category extends MaterializedPathNode<Category> {
+public class ProductCategory extends MaterializedPathNode<ProductCategory> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,15 +35,15 @@ public class Category extends MaterializedPathNode<Category> {
         this.id = id;
     }
 
-    public Category() {
+    public ProductCategory() {
     }
 
-    public Category(String path, int depth, int numChild, String name) {
+    public ProductCategory(String path, int depth, int numChild, String name) {
         super(path, depth, numChild, name);
         this.name = name;
     }
 
-    public Category(String name) {
+    public ProductCategory(String name) {
         this.name = name;
     }
 
