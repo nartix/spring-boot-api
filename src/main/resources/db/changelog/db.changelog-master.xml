@@ -432,42 +432,6 @@
                 onDelete="SET NULL"/>
     </changeSet>
 
-    <changeSet id="create_product_productattribute_table" author="Feroz">
-        <createTable tableName="product_productattribute">
-            <column name="id" type="INT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="product_id" type="INT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="attribute_value" type="INT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        <addUniqueConstraint
-                tableName="product_productattribute"
-                columnNames="product_id, attribute_value"
-                constraintName="uq_product_productattribute_product_attribute_value" />
-        <createIndex indexName="product_productattribute_product_attribute_value_idx" tableName="product_productattribute">
-            <column name="product_id"/>
-            <column name="attribute_value"/>
-        </createIndex>
-        <addForeignKeyConstraint
-                baseTableName="product_productattribute"
-                baseColumnNames="product_id"
-                constraintName="fk_product_productattribute_product"
-                referencedTableName="product_product"
-                referencedColumnNames="id"
-                onDelete="CASCADE" />
-        <addForeignKeyConstraint
-                baseTableName="product_productattribute"
-                baseColumnNames="attribute_value"
-                constraintName="fk_product_productattribute_attributevalue"
-                referencedTableName="product_attributevalue"
-                referencedColumnNames="id"
-                onDelete="CASCADE"/>
-    </changeSet>
-
     <changeSet id="create_product_product_category_table" author="Feroz">
         <createTable tableName="product_product_category">
             <column name="id" type="INT" autoIncrement="true">
@@ -588,5 +552,41 @@
                 referencedTableName="product_manufacturer"
                 referencedColumnNames="id"
                 onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet id="create_product_productattribute_table" author="Feroz">
+        <createTable tableName="product_productattribute">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="product_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attribute_value" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                tableName="product_productattribute"
+                columnNames="product_id, attribute_value"
+                constraintName="uq_product_productattribute_product_attribute_value" />
+        <createIndex indexName="product_productattribute_product_attribute_value_idx" tableName="product_productattribute">
+            <column name="product_id"/>
+            <column name="attribute_value"/>
+        </createIndex>
+        <addForeignKeyConstraint
+                baseTableName="product_productattribute"
+                baseColumnNames="product_id"
+                constraintName="fk_product_productattribute_product"
+                referencedTableName="product_product"
+                referencedColumnNames="id"
+                onDelete="CASCADE" />
+        <addForeignKeyConstraint
+                baseTableName="product_productattribute"
+                baseColumnNames="attribute_value"
+                constraintName="fk_product_productattribute_attributevalue"
+                referencedTableName="product_attributevalue"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
     </changeSet>
 </databaseChangeLog>
