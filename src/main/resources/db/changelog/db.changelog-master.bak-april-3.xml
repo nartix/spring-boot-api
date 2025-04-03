@@ -33,6 +33,7 @@
             <column name="password" type="VARCHAR(128)">
                 <constraints nullable="false"/>
             </column>
+
             <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
                 <constraints nullable="false"/>
             </column>
@@ -144,6 +145,7 @@
             </column>
             <column name="PRINCIPAL_NAME" type="VARCHAR(100)"/>
             <column name="USER_ID" type="BIGINT"/>
+
             <!-- Geo-location fields -->
             <column name="LATITUDE" type="DECIMAL(10, 8)">
                 <constraints nullable="true"/>
@@ -154,6 +156,7 @@
             <column name="IP_ADDRESS" type="VARCHAR(45)">
                 <constraints nullable="true"/>
             </column>
+
             <!-- Additional identifiable information -->
             <column name="USER_AGENT" type="VARCHAR(255)">
                 <constraints nullable="true"/>
@@ -228,6 +231,7 @@
                 onDelete="CASCADE"/>
     </changeSet>
 
+
     <changeSet author="Feroz" id="create_user_roles_table">
         <createTable tableName="user_roles">
             <column name="role_id" type="BIGINT">
@@ -261,7 +265,13 @@
                 referencedColumnNames="id"
                 referencedTableName="users"
                 validate="true" />
+
+
     </changeSet>
+
+<!--    <changeSet author="Feroz" id="add_fk_constraint_session_primary_id_spring_session_attributes">-->
+<!--        <addForeignKeyConstraint baseColumnNames="session_primary_id" baseTableName="spring_session_attributes" constraintName="spring_session_attributes_fk" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="primary_id" referencedTableName="spring_session" validate="true"/>-->
+<!--    </changeSet>-->
 
     <changeSet  author="Feroz" id="create_category_table">
         <createTable tableName="category">
@@ -289,6 +299,7 @@
             <column name="name" />
         </createIndex>
     </changeSet>
+
 
     <!-- Product changesets -->
     <changeSet id="create_product_category_table" author="Feroz">
@@ -421,7 +432,77 @@
                 onDelete="SET NULL"/>
     </changeSet>
 
-    <!-- Moved 'product_product' creation BEFORE referencing changesets -->
+    <changeSet id="create_product_product_category_table" author="Feroz">
+        <createTable tableName="product_product_category">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="product_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                tableName="product_product_category"
+                columnNames="product_id, category_id"
+                constraintName="uq_product_product_category_product_category"/>
+        <createIndex indexName="product_product_category_product_category_idx" tableName="product_product_category">
+            <column name="product_id"/>
+            <column name="category_id"/>
+        </createIndex>
+        <addForeignKeyConstraint
+                baseTableName="product_product_category"
+                baseColumnNames="product_id"
+                constraintName="fk_product_product_category_product"
+                referencedTableName="product_product"
+                referencedColumnNames="id"
+                onDelete="CASCADE" />
+        <addForeignKeyConstraint
+                baseTableName="product_product_category"
+                baseColumnNames="category_id"
+                constraintName="fk_product_product_category_category"
+                referencedTableName="product_category"
+                referencedColumnNames="id"
+                onDelete="CASCADE" />
+    </changeSet>
+
+    <changeSet id="create_product_productpricehistory_table" author="Feroz">
+        <createTable tableName="product_productpricehistory">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="product_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="DATETIME"/>
+            <column name="is_current" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex indexName="product_productpricehistory_product_start_date_idx" tableName="product_productpricehistory">
+            <column name="product_id"/>
+            <column name="start_date" descending="true"/>
+        </createIndex>
+        <createIndex indexName="product_productpricehistory_is_current_idx" tableName="product_productpricehistory">
+            <column name="is_current"/>
+        </createIndex>
+        <addForeignKeyConstraint
+                baseTableName="product_productpricehistory"
+                baseColumnNames="product_id"
+                constraintName="fk_product_productpricehistory_product"
+                referencedTableName="product_product"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+    </changeSet>
+
     <changeSet id="create_product_product_table" author="Feroz">
         <createTable tableName="product_product">
             <column name="id" type="INT" autoIncrement="true">
@@ -434,7 +515,7 @@
             <column name="base_price" type="DECIMAL(10,2)">
                 <constraints nullable="false"/>
             </column>
-            <!-- <column name="image_url" type="VARCHAR(200)"/> -->
+<!--            <column name="image_url" type="VARCHAR(200)"/>-->
             <column name="view_count" type="INT" defaultValueNumeric="0">
                 <constraints nullable="false"/>
             </column>
@@ -505,77 +586,6 @@
                 baseColumnNames="attribute_value"
                 constraintName="fk_product_productattribute_attributevalue"
                 referencedTableName="product_attributevalue"
-                referencedColumnNames="id"
-                onDelete="CASCADE"/>
-    </changeSet>
-
-    <changeSet id="create_product_product_category_table" author="Feroz">
-        <createTable tableName="product_product_category">
-            <column name="id" type="INT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="product_id" type="INT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="category_id" type="INT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        <addUniqueConstraint
-                tableName="product_product_category"
-                columnNames="product_id, category_id"
-                constraintName="uq_product_product_category_product_category"/>
-        <createIndex indexName="product_product_category_product_category_idx" tableName="product_product_category">
-            <column name="product_id"/>
-            <column name="category_id"/>
-        </createIndex>
-        <addForeignKeyConstraint
-                baseTableName="product_product_category"
-                baseColumnNames="product_id"
-                constraintName="fk_product_product_category_product"
-                referencedTableName="product_product"
-                referencedColumnNames="id"
-                onDelete="CASCADE" />
-        <addForeignKeyConstraint
-                baseTableName="product_product_category"
-                baseColumnNames="category_id"
-                constraintName="fk_product_product_category_category"
-                referencedTableName="product_category"
-                referencedColumnNames="id"
-                onDelete="CASCADE" />
-    </changeSet>
-
-    <changeSet id="create_product_productpricehistory_table" author="Feroz">
-        <createTable tableName="product_productpricehistory">
-            <column name="id" type="INT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="product_id" type="INT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="price" type="DECIMAL(10,2)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="start_date" type="DATETIME">
-                <constraints nullable="false"/>
-            </column>
-            <column name="end_date" type="DATETIME"/>
-            <column name="is_current" type="BOOLEAN" defaultValueBoolean="true">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        <createIndex indexName="product_productpricehistory_product_start_date_idx" tableName="product_productpricehistory">
-            <column name="product_id"/>
-            <column name="start_date" descending="true"/>
-        </createIndex>
-        <createIndex indexName="product_productpricehistory_is_current_idx" tableName="product_productpricehistory">
-            <column name="is_current"/>
-        </createIndex>
-        <addForeignKeyConstraint
-                baseTableName="product_productpricehistory"
-                baseColumnNames="product_id"
-                constraintName="fk_product_productpricehistory_product"
-                referencedTableName="product_product"
                 referencedColumnNames="id"
                 onDelete="CASCADE"/>
     </changeSet>
