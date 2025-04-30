@@ -427,6 +427,12 @@
             <column name="id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="true"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="true"/>
+            </column>
             <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
