@@ -47,8 +47,4 @@ public class ProductCategory extends MaterializedPathNode<ProductCategory> {
     public ProductCategory(String name) {
         this.name = name;
     }
-
-    public static int getPathColumnLength() {
-        return 300;
-    }
 }

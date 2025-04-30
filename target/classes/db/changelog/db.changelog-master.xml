@@ -334,7 +334,7 @@
         </createIndex>
     </changeSet>
 
-    <changeSet id="create_product_brand_table" author="Universal Liberator">
+    <changeSet id="create_product_brand_table" author="Feroz">
         <createTable tableName="product_brand">
             <column name="id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
