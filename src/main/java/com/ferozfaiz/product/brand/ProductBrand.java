@@ -1,4 +1,4 @@
-package com.ferozfaiz.product.model.manufacturer;
+package com.ferozfaiz.product.brand;
 
 import jakarta.persistence.*;
 
@@ -8,12 +8,12 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(
-        name = "product_manufacturer",
+        name = "product_brand",
         indexes = {
-                @Index(name = "product_manufacturer_name_idx", columnList = "name")
+                @Index(name = "product_brand_name_idx", columnList = "name")
         }
 )
-public class ProductManufacturer {
+public class ProductBrand {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +22,9 @@ public class ProductManufacturer {
     @Column(nullable = false, length = 255)
     private String name;
 
-    public ProductManufacturer() {}
+    public ProductBrand() {}
 
-    public ProductManufacturer(String name) {
+    public ProductBrand(String name) {
         this.name = name;
     }
 
@@ -45,4 +45,3 @@ public class ProductManufacturer {
     }
 
 }
-

@@ -1,4 +1,4 @@
-package com.ferozfaiz.product.model.Brand;
+package com.ferozfaiz.product.brand;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,4 +1,4 @@
-package com.ferozfaiz.product.model.Brand;
+package com.ferozfaiz.product.brand;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;

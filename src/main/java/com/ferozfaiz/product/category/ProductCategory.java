@@ -1,4 +1,4 @@
-package com.ferozfaiz.product.model.category;
+package com.ferozfaiz.product.category;
 
 import com.ferozfaiz.common.tree.materializedpath.MaterializedPathNode;
 import jakarta.persistence.*;

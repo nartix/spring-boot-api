@@ -515,8 +515,8 @@
                 onDelete="CASCADE"/>
     </changeSet>
 
-    <changeSet id="create_product_product_category_table" author="Feroz">
-        <createTable tableName="product_product_category">
+    <changeSet id="create_product_productcategory_table" author="Feroz">
+        <createTable tableName="product_productcategory">
             <column name="id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -528,24 +528,24 @@
             </column>
         </createTable>
         <addUniqueConstraint
-                tableName="product_product_category"
+                tableName="product_productcategory"
                 columnNames="product_id, category_id"
-                constraintName="uq_product_product_category_product_category"/>
-        <createIndex indexName="product_product_category_product_category_idx" tableName="product_product_category">
+                constraintName="uq_product_productcategory_product_category"/>
+        <createIndex indexName="product_productcategory_product_category_idx" tableName="product_productcategory">
             <column name="product_id"/>
             <column name="category_id"/>
         </createIndex>
         <addForeignKeyConstraint
-                baseTableName="product_product_category"
+                baseTableName="product_productcategory"
                 baseColumnNames="product_id"
-                constraintName="fk_product_product_category_product"
+                constraintName="fk_product_productcategory_product"
                 referencedTableName="product_product"
                 referencedColumnNames="id"
                 onDelete="CASCADE" />
         <addForeignKeyConstraint
-                baseTableName="product_product_category"
+                baseTableName="product_productcategory"
                 baseColumnNames="category_id"
-                constraintName="fk_product_product_category_category"
+                constraintName="fk_product_productcategory_category"
                 referencedTableName="product_category"
                 referencedColumnNames="id"
                 onDelete="CASCADE" />

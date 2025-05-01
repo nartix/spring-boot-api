@@ -1,4 +1,4 @@
-package com.ferozfaiz.product.model.manufacturer;
+package com.ferozfaiz.product.manufacturer;
 
 import java.util.List;
 
