@@ -13,13 +13,13 @@ import jakarta.persistence.*;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uq_product_productattribute_product_attribute_value",
-                        columnNames = {"product_id", "attribute_value"}
+                        columnNames = {"product_id", "attribute_value_id"}
                 )
         },
         indexes = {
                 @Index(
                         name = "product_productattribute_product_attribute_value_idx",
-                        columnList = "product_id, attribute_value"
+                        columnList = "product_id, attribute_value_id"
                 )
         }
 )
@@ -45,12 +45,12 @@ public class ProductProductAttribute {
     // FK → product_attributevalue.id, ON DELETE CASCADE
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
-            name = "attribute_value",
+            name = "attribute_value_id",
             nullable = false,
             foreignKey = @ForeignKey(
                     name = "fk_product_productattribute_attributevalue",
                     foreignKeyDefinition =
-                            "FOREIGN KEY (attribute_value) REFERENCES product_attributevalue(id) ON DELETE CASCADE"
+                            "FOREIGN KEY (attribute_value_id) REFERENCES product_attributevalue(id) ON DELETE CASCADE"
             )
     )
     private ProductAttributeValue attributeValue;

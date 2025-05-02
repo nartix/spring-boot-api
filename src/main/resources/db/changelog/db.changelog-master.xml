@@ -334,7 +334,7 @@
         </createIndex>
     </changeSet>
 
-    <changeSet id="create_product_brand_table" author="Feroz">
+    <changeSet id="create_product_brand_table" author="Feroz" >
         <createTable tableName="product_brand">
             <column name="id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -424,7 +424,7 @@
     <!-- Moved 'product_product' creation BEFORE referencing changesets -->
     <changeSet id="create_product_product_table" author="Feroz">
         <createTable tableName="product_product">
-            <column name="id" type="INT" autoIncrement="true">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
@@ -484,20 +484,20 @@
             <column name="id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="product_id" type="INT">
+            <column name="product_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="attribute_value" type="INT">
+            <column name="attribute_value_id" type="INT">
                 <constraints nullable="false"/>
             </column>
         </createTable>
         <addUniqueConstraint
                 tableName="product_productattribute"
-                columnNames="product_id, attribute_value"
+                columnNames="product_id, attribute_value_id"
                 constraintName="uq_product_productattribute_product_attribute_value" />
         <createIndex indexName="product_productattribute_product_attribute_value_idx" tableName="product_productattribute">
             <column name="product_id"/>
-            <column name="attribute_value"/>
+            <column name="attribute_value_id"/>
         </createIndex>
         <addForeignKeyConstraint
                 baseTableName="product_productattribute"
@@ -508,7 +508,7 @@
                 onDelete="CASCADE" />
         <addForeignKeyConstraint
                 baseTableName="product_productattribute"
-                baseColumnNames="attribute_value"
+                baseColumnNames="attribute_value_id"
                 constraintName="fk_product_productattribute_attributevalue"
                 referencedTableName="product_attributevalue"
                 referencedColumnNames="id"
@@ -520,10 +520,10 @@
             <column name="id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="product_id" type="INT">
+            <column name="product_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="category_id" type="INT">
+            <column name="category_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -556,7 +556,7 @@
             <column name="id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="product_id" type="INT">
+            <column name="product_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
             <column name="price" type="DECIMAL(10,2)">
