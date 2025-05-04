@@ -16,7 +16,9 @@ spring:
 
   liquibase:
     default-schema: dev
-    drop-first: true
+    drop-first: false
+    # Uncomment the following line to drop the database before running migrations
+#    drop-first: true
 
   jpa:
     show-sql: true

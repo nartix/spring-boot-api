@@ -51,7 +51,7 @@ public class Product {
     @Column(length = 255)
     private String slug;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
             name = "brand_id",
             foreignKey = @ForeignKey(
