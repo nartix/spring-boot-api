@@ -3,6 +3,7 @@ package com.ferozfaiz.product.productattribute;
 import com.ferozfaiz.product.attributevalue.ProductAttributeValue;
 import com.ferozfaiz.product.product.Product;
 import jakarta.persistence.*;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 /**
  * @author Feroz Faiz
@@ -30,7 +31,7 @@ public class ProductProductAttribute {
     private Integer id;
 
     // FK → product_product.id, ON DELETE CASCADE
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(
             name = "product_id",
             nullable = false,
@@ -40,10 +41,11 @@ public class ProductProductAttribute {
                             "FOREIGN KEY (product_id) REFERENCES product_product(id) ON DELETE CASCADE"
             )
     )
+    @RestResource(exported = false)
     private Product product;
 
     // FK → product_attributevalue.id, ON DELETE CASCADE
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(
             name = "attribute_value_id",
             nullable = false,
@@ -53,6 +55,7 @@ public class ProductProductAttribute {
                             "FOREIGN KEY (attribute_value_id) REFERENCES product_attributevalue(id) ON DELETE CASCADE"
             )
     )
+    @RestResource(exported = false)
     private ProductAttributeValue attributeValue;
 
     public ProductProductAttribute() {}

@@ -3,6 +3,7 @@ package com.ferozfaiz.product.attributevalue;
 import com.ferozfaiz.product.attribute.ProductAttribute;
 import com.ferozfaiz.product.measurementunit.ProductMeasurementUnit;
 import jakarta.persistence.*;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 /**
  * @author Feroz Faiz
@@ -15,6 +16,7 @@ import jakarta.persistence.*;
                 @Index(name = "product_attributevalue_attribute_idx", columnList = "attribute_id")
         }
 )
+//@RepositoryRestResource( exported = false )
 public class ProductAttributeValue {
 
     @Id
@@ -31,6 +33,7 @@ public class ProductAttributeValue {
                     foreignKeyDefinition = "FOREIGN KEY (attribute_id) REFERENCES product_attribute(id) ON DELETE CASCADE"
             )
     )
+    @RestResource(exported = false)
     private ProductAttribute attribute;
 
     @Column(name = "value_string", length = 255)
@@ -43,7 +46,7 @@ public class ProductAttributeValue {
     private Boolean valueBoolean;
 
     // FK → product_measurementunit.id, ON DELETE SET NULL handled at DB level
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
             name = "measurement_unit_id",
             foreignKey = @ForeignKey(
@@ -51,6 +54,7 @@ public class ProductAttributeValue {
                     foreignKeyDefinition = "FOREIGN KEY (measurement_unit_id) REFERENCES product_measurementunit(id) ON DELETE SET NULL"
             )
     )
+    @RestResource(exported = false)
     private ProductMeasurementUnit measurementUnit;
 
     public ProductAttributeValue() {}

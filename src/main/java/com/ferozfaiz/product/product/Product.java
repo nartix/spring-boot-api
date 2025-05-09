@@ -1,11 +1,20 @@
 package com.ferozfaiz.product.product;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.ferozfaiz.product.brand.ProductBrand;
 import com.ferozfaiz.product.manufacturer.ProductManufacturer;
+import com.ferozfaiz.product.productattribute.ProductProductAttribute;
+import com.ferozfaiz.product.productpricehistory.ProductPriceHistory;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JoinColumnOrFormula;
+import org.hibernate.annotations.JoinColumnsOrFormulas;
+import org.hibernate.annotations.JoinFormula;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Feroz Faiz
@@ -60,9 +69,10 @@ public class Product {
                             "FOREIGN KEY (brand_id) REFERENCES product_brand(id) ON DELETE SET NULL"
             )
     )
+    @RestResource(exported = false)
     private ProductBrand brand;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
             name = "manufacturer_id",
             foreignKey = @ForeignKey(
@@ -71,7 +81,46 @@ public class Product {
                             "FOREIGN KEY (manufacturer_id) REFERENCES product_manufacturer(id) ON DELETE SET NULL"
             )
     )
+    @RestResource(exported = false)
     private ProductManufacturer manufacturer;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumnsOrFormulas({
+            // 1) map this entity's PK (p.id) to the FK column (h.product_id)
+            @JoinColumnOrFormula(
+                    column = @JoinColumn(
+                            name = "id",
+                            referencedColumnName = "product_id",
+                            insertable = false,   // if you don't want to write through
+                            updatable = false
+                    )
+            ),
+            // 2) restrict to the row where is_current = true
+            @JoinColumnOrFormula(
+                    formula = @JoinFormula(
+                            value = "true",
+                            referencedColumnName = "is_current"
+                    )
+            )
+    })
+    @RestResource(exported = false)
+    @JsonManagedReference
+    private ProductPriceHistory currentPriceHistory;
+
+    public ProductPriceHistory getCurrentPriceHistory() {
+        return currentPriceHistory;
+    }
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
+    @RestResource(exported = false)
+    private Set<ProductProductAttribute> productAttributes = new HashSet<>();
+
+    public Set<ProductProductAttribute> getProductAttributes() {
+        return productAttributes;
+    }
+    public void setProductAttributes(Set<ProductProductAttribute> productAttributes) {
+        this.productAttributes = productAttributes;
+    }
 
     public Product() {}
 

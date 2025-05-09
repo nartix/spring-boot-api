@@ -1,9 +1,11 @@
 package com.ferozfaiz.product.product;
 
-import com.ferozfaiz.product.brand.ProductBrand;
-import com.ferozfaiz.product.manufacturer.ProductManufacturer;
-
+import com.ferozfaiz.product.productattribute.ProductProductAttributeProjection;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.rest.core.config.Projection;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author Feroz Faiz
@@ -18,12 +20,19 @@ public interface ProductProjection {
 
     String getSlug();
 
-    ProductBrand getBrand();
+//    ProductBrand getBrand();
 
-    ProductManufacturer getManufacturer();
+//    ProductManufacturer getManufacturer();
 
     Boolean getIsActive();
 
     Integer getViewCount();
 
+
+    //    @Value("#{target.currentPriceHistory?.get(0)?.price}")
+//    @Value("#{target.priceHistories?.get(0)?.price}")
+    @Value("#{target.currentPriceHistory?.price}")
+    BigDecimal getPrice();
+//
+    List<ProductProductAttributeProjection> getProductAttributes();
 }

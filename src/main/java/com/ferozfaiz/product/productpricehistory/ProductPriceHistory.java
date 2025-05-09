@@ -1,7 +1,9 @@
 package com.ferozfaiz.product.productpricehistory;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ferozfaiz.product.product.Product;
 import jakarta.persistence.*;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -10,6 +12,7 @@ import java.time.LocalDateTime;
  * @author Feroz Faiz
  */
 @Entity
+//@FilterDef(name = "currentPriceFilter", defaultCondition = "is_current = true")
 @Table(
         name = "product_productpricehistory",
         indexes = {
@@ -41,6 +44,8 @@ public class ProductPriceHistory {
                             "FOREIGN KEY (product_id) REFERENCES product_product(id) ON DELETE CASCADE"
             )
     )
+    @JsonBackReference
+    @RestResource(exported = false)
     private Product product;
 
     @Column(nullable = false, precision = 10, scale = 2)
