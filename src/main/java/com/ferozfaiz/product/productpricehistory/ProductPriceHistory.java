@@ -34,7 +34,7 @@ public class ProductPriceHistory {
     private Integer id;
 
     // FK → product_product.id, ON DELETE CASCADE
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(
             name = "product_id",
             nullable = false,

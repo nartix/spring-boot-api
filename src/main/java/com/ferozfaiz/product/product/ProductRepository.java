@@ -18,13 +18,13 @@ import java.util.Optional;
  * with sort, filter, and pagination all on a single api endpoint.
  * QueryDSL and JPA Specification/Criteria API run into issues with the
  * firstResult/maxResults where it loads all the data
- * into memory before paging where sort and filter
- * are not applied.
- * Also, nested ordering is not supported and ignored by Spring Data REST.
+ * into memory before pagination is applied and then
+ * skips sorting and filtering on the query.
+ * Also, deeply nested ordering is not supported and ignored by Spring Data REST.
  * I created a custom API to handle this.
  */
 @RepositoryRestResource(collectionResourceRel = "products", path = "products", excerptProjection = ProductProjection.class)
-public interface ProductRepository extends JpaRepository<Product, Integer>,JpaSpecificationExecutor<Product> {
+public interface ProductRepository extends JpaRepository<Product, Integer>,JpaSpecificationExecutor<Product>, ProductRepositoryCustom  {
 // public interface ProductRepository extends JpaRepository<Product, Integer>, QuerydslPredicateExecutor<Product>, QuerydslBinderCustomizer<QProduct>, ProductRepositoryCustom, JpaSpecificationExecutor<Product> {
 //public interface ProductRepository extends JpaRepository<Product, Integer>, QuerydslPredicateExecutor<Product>,
 //        QuerydslBinderCustomizer<QProduct> {

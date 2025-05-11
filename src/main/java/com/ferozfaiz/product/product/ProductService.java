@@ -1,5 +1,8 @@
 package com.ferozfaiz.product.product;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -11,6 +14,8 @@ public interface ProductService {
     Product create(Product product);
 
     List<Product> findAll();
+
+    Page<ProductDto> findAll(ProductFilter filter, Pageable pg);
 
     Product findById(Integer id);
 

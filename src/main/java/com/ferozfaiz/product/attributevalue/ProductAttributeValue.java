@@ -24,7 +24,7 @@ public class ProductAttributeValue {
     private Integer id;
 
     // FK → product_attribute.id, ON DELETE CASCADE handled at DB level
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
             name = "attribute_id",
             nullable = false,

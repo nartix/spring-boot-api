@@ -34,7 +34,7 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "created_at")
     private OffsetDateTime createdAt;
@@ -113,6 +113,7 @@ public class Product {
 
     @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
     @RestResource(exported = false)
+    @JsonManagedReference
     private Set<ProductProductAttribute> productAttributes = new HashSet<>();
 
     public Set<ProductProductAttribute> getProductAttributes() {
@@ -126,11 +127,11 @@ public class Product {
 
     // Constructors, getters & setters
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -1,6 +1,8 @@
 package com.ferozfaiz.product.product;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,10 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public List<Product> findAll() {
         return repo.findAll();                 // SELECT * → O(n)
+    }
+
+    public Page<ProductDto> findAll(ProductFilter filter, Pageable pg) {
+        return repo.findAllByFilter(filter, pg);
     }
 
     @Override

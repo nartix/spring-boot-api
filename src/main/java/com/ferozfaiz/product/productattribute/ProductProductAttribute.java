@@ -1,5 +1,6 @@
 package com.ferozfaiz.product.productattribute;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ferozfaiz.product.attributevalue.ProductAttributeValue;
 import com.ferozfaiz.product.product.Product;
 import jakarta.persistence.*;
@@ -42,6 +43,7 @@ public class ProductProductAttribute {
             )
     )
     @RestResource(exported = false)
+    @JsonBackReference
     private Product product;
 
     // FK → product_attributevalue.id, ON DELETE CASCADE
