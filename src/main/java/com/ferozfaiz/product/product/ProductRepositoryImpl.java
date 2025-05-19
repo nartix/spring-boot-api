@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+// http://localhost:8080/api/products?sort=valueNumeric,desc&attributeName=Width&attributeValueNumeric=55&&attributeValueNumeric=5
+
 /**
  * @author Feroz
  */
@@ -24,144 +26,217 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     @Override
     public Page<ProductDto> findAllByFilter(ProductFilter filter, Pageable pageable) {
-        // ----------------------------
-        // 1) Build the FROM + JOIN clauses
-        // ----------------------------
-        String joins = ""
-                + "FROM Product p "
-                + " LEFT JOIN p.brand b "
-                + " LEFT JOIN p.manufacturer m "
-                + " LEFT JOIN p.currentPriceHistory cph "
-                // always join attributes for DTO (we need every attribute row)
-                + " JOIN p.productAttributes pa "
-                + " JOIN pa.attributeValue av "
-                + " JOIN av.attribute a "
-                + " LEFT JOIN av.measurementUnit mu ";
+        // 1) Static joins for brand/manufacturer/price
+        String baseJoins = ""
+                + " FROM Product p"
+                + " LEFT JOIN p.brand b"
+                + " LEFT JOIN p.manufacturer m"
+                + " LEFT JOIN p.currentPriceHistory cph";
 
-        // ----------------------------
-        // 2) Build WHERE dynamically (exactly as before)
-        // ----------------------------
-        StringBuilder where = new StringBuilder("WHERE 1=1 ");
+        // 2) Dynamic WHERE (note: we no longer filter out products missing the attribute)
+        StringBuilder where = new StringBuilder(" WHERE 1=1");
         Map<String, Object> params = new HashMap<>();
-
         if (filter.getName() != null) {
-            where.append("AND LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')) ");
+            where.append(" AND LOWER(p.name) LIKE LOWER(CONCAT('%',:name,'%'))");
             params.put("name", filter.getName());
         }
         if (filter.getMinBasePrice() != null) {
-            where.append("AND p.basePrice >= :minBasePrice ");
+            where.append(" AND p.basePrice >= :minBasePrice");
             params.put("minBasePrice", filter.getMinBasePrice());
         }
         if (filter.getMaxBasePrice() != null) {
-            where.append("AND p.basePrice <= :maxBasePrice ");
+            where.append(" AND p.basePrice <= :maxBasePrice");
             params.put("maxBasePrice", filter.getMaxBasePrice());
         }
         if (filter.getActive() != null) {
-            where.append("AND p.isActive = :active ");
+            where.append(" AND p.isActive = :active");
             params.put("active", filter.getActive());
         }
         if (filter.getBrandName() != null) {
-            where.append("AND LOWER(b.name) = LOWER(:brandName) ");
+            where.append(" AND LOWER(b.name) = LOWER(:brandName)");
             params.put("brandName", filter.getBrandName());
         }
         if (filter.getManufacturerName() != null) {
-            where.append("AND LOWER(m.name) = LOWER(:manufacturerName) ");
+            where.append(" AND LOWER(m.name) = LOWER(:manufacturerName)");
             params.put("manufacturerName", filter.getManufacturerName());
         }
-        if (filter.getAttributeName() != null) {
-            where.append("AND LOWER(a.name) = LOWER(:attributeName) ");
-            params.put("attributeName", filter.getAttributeName());
-        }
-        if (filter.getAttributeValueNumeric() != null) {
-            where.append("AND av.valueNumeric = :attributeValueNumeric ");
-            params.put("attributeValueNumeric", filter.getAttributeValueNumeric());
-        }
-        // … add more filters as needed …
+        // … any other filters, but *no* attributeName filter here …
 
-        // ----------------------------
-        // 3) COUNT query (same as before)
-        // ----------------------------
-        String countJpql = "SELECT COUNT(DISTINCT p.id) " + joins + where;
+
+        // Decided not go with inner join here, as it requires the use of DISTINCT
+        // for all ORDER BY fields.
+//        filterJoins = ""
+//                + " JOIN p.productAttributes paF"
+//                + "   WITH LOWER(paF.attributeValue.attribute.name) = LOWER(:attributeName)"
+//                + "   AND LOWER(paF.attributeValue.valueString) IN :valueStrings"
+//                + " JOIN paF.attributeValue avF";
+        // 2a) filter by attribute-valueStrings (e.g. Speed = {DDR4, DDR5})
+// … inside findAllByFilter, after you’ve built `baseJoins`, `where`, and `params` …
+
+        // Only fire this once if you have at least one of the two filters:
+        if (filter.getAttributeName() != null &&
+                (
+                        (filter.getAttributeValueString() != null
+                                && !filter.getAttributeValueString().isEmpty())
+                                || (filter.getAttributeValueNumeric() != null
+                                && !filter.getAttributeValueNumeric().isEmpty())
+                )
+        ) {
+            // bind the attribute name
+            params.put("attributeName", filter.getAttributeName());
+
+            // start a single EXISTS subquery
+            where.append("""
+                      AND EXISTS (
+                        SELECT pa
+                          FROM p.productAttributes pa
+                          JOIN pa.attributeValue av
+                         WHERE LOWER(pa.attributeValue.attribute.name) = LOWER(:attributeName)
+                    """);
+
+            // string‐match portion (if any)
+            if (filter.getAttributeValueString() != null
+                    && !filter.getAttributeValueString().isEmpty()) {
+
+                List<String> lowered = filter.getAttributeValueString().stream()
+                        .map(String::toLowerCase)
+                        .toList();
+                where.append("   AND LOWER(av.valueString) IN :valueStrings\n");
+                params.put("valueStrings", lowered);
+            }
+
+            // numeric‐match portion (if any)
+            if (filter.getAttributeValueNumeric() != null
+                    && !filter.getAttributeValueNumeric().isEmpty()) {
+
+                where.append("   AND av.valueNumeric    IN :valueNumerics\n");
+                params.put("valueNumerics", filter.getAttributeValueNumeric());
+            }
+
+            // close the EXISTS
+            where.append(")\n");
+        }
+
+        // 3) Total count on all matching products
+        String countJpql = "SELECT COUNT(p.id)" + baseJoins + where;
         TypedQuery<Long> countQ = em.createQuery(countJpql, Long.class);
         params.forEach(countQ::setParameter);
         long total = countQ.getSingleResult();
 
-        // ----------------------------
-        // 4) DATA query: select flat rows for DTO-construction
-        // ----------------------------
-        String selectJpql = ""
-                + "SELECT p.id AS id, "
-                + "       p.name AS name, "
-                + "       a.name AS attributeName, "
-                + "       av.valueNumeric AS attributeValue, "
-                + "       mu.symbol AS measurementUnitSymbol "
-                + joins
-                + where
-                + buildOrderBy(pageable.getSort());
-
-        TypedQuery<Tuple> dataQ = em.createQuery(selectJpql, Tuple.class);
-        params.forEach(dataQ::setParameter);
-        dataQ.setFirstResult((int) pageable.getOffset());
-        dataQ.setMaxResults(pageable.getPageSize());
-
-        List<Tuple> tuples = dataQ.getResultList();
-
-        LinkedHashMap<Long, ProductDtoBuilder> productMap = new LinkedHashMap<>();
-        for (Tuple tuple : tuples) {
-            Long productId = tuple.get("id", Long.class);
-            String productName = tuple.get("name", String.class);
-            String attributeName = tuple.get("attributeName", String.class);
-            Double attributeValue = tuple.get("attributeValue", Number.class) != null ?
-                    tuple.get("attributeValue", Number.class).doubleValue() : null;
-            String measurementUnitSymbol = tuple.get("measurementUnitSymbol", String.class);
-
-            productMap
-                    .computeIfAbsent(productId, id -> new ProductDtoBuilder(productId, productName))
-                    .addAttribute(new AttributeDto(attributeName, attributeValue, measurementUnitSymbol));
+        // 4) Build a LEFT JOIN … WITH … for sorting by the chosen attribute
+        String sortJoins = "";
+        if (filter.getAttributeName() != null) {
+            sortJoins = ""
+                    + " LEFT JOIN p.productAttributes paSort"
+                    + "   WITH LOWER(paSort.attributeValue.attribute.name) = LOWER(:attributeName)"
+                    + " LEFT JOIN paSort.attributeValue avSort";
+            params.put("attributeName", filter.getAttributeName());
         }
 
-        List<ProductDto> productDtos = productMap.values()
+        // 5) ID query: apply pagination + sort on avSort.valueNumeric (NULL when missing)
+        String idJpql = ""
+                + "SELECT p.id"
+                + baseJoins
+                + sortJoins
+                + where
+                + buildOrderBy(pageable.getSort(), /* idQuery= */ true);
+
+        TypedQuery<Long> idQ = em.createQuery(idJpql, Long.class);
+        params.forEach(idQ::setParameter);
+        idQ.setFirstResult((int) pageable.getOffset());
+        idQ.setMaxResults(pageable.getPageSize());
+        List<Long> ids = idQ.getResultList();
+
+        if (ids.isEmpty()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, total);
+        }
+
+        // 6) Fetch *all* attributes for those IDs
+        String dataJoins = ""
+                + baseJoins
+                + " JOIN p.productAttributes pa"
+                + " JOIN pa.attributeValue av"
+                + " JOIN av.attribute a"
+                + " LEFT JOIN av.measurementUnit mu";
+
+        String dataJpql = ""
+                + "SELECT"
+                + "  p.id                AS id,"
+                + "  p.name              AS name,"
+                + "  a.name              AS attributeName,"
+                + "  av.valueNumeric     AS attributeValueNumeric,"
+                + "  av.valueString      AS attributeValueString,"
+                + "  mu.symbol           AS measurementUnitSymbol"
+                + dataJoins
+                + " WHERE p.id IN :ids";
+
+        TypedQuery<Tuple> dataQ = em.createQuery(dataJpql, Tuple.class);
+        dataQ.setParameter("ids", ids);
+        List<Tuple> tuples = dataQ.getResultList();
+
+        // 7) Group into DTOs in the same order as our IDs
+        LinkedHashMap<Long, ProductDtoBuilder> productMap = new LinkedHashMap<>();
+        ids.forEach(id -> productMap.put(id, null));
+
+        for (Tuple t : tuples) {
+            Long pid = t.get("id", Long.class);
+            var builder = productMap.get(pid);
+            if (builder == null) {
+                builder = new ProductDtoBuilder(pid, t.get("name", String.class));
+                productMap.put(pid, builder);
+            }
+            Double value = Optional.ofNullable(t.get("attributeValueNumeric", Number.class))
+                    .map(Number::doubleValue)
+                    .orElse(null);
+            builder.addAttribute(new AttributeDto(
+                    t.get("attributeName", String.class),
+                    value,
+                    t.get("attributeValueString", String.class),
+                    t.get("measurementUnitSymbol", String.class)
+            ));
+        }
+
+        List<ProductDto> dtos = productMap.values()
                 .stream()
                 .map(ProductDtoBuilder::build)
                 .toList();
 
-        return new PageImpl<>(productDtos, pageable, total);
+        return new PageImpl<>(dtos, pageable, total);
     }
 
-    // ----------------------------------------------------------------
-    // unchanged: dynamic ORDER BY builder
-    // ----------------------------------------------------------------
-    private String buildOrderBy(Sort sort) {
+    private String buildOrderBy(Sort sort, boolean idQuery) {
         if (!sort.isSorted()) {
             return "";
         }
         List<String> clauses = new ArrayList<>();
         for (Sort.Order o : sort) {
-            String aliasPath = switch (o.getProperty()) {
-                case "name"                                           -> "p.name";
-                case "basePrice"                                      -> "p.basePrice";
-                case "brand.name"                                     -> "b.name";
-                case "manufacturer.name"                              -> "m.name";
-                case "currentPriceHistory.price", "currentPrice"      -> "cph.price";
-                case "productAttributes.attributeValue.valueNumeric"  -> "av.valueNumeric";
-                case "productAttributes.attributeValue.attribute.name"-> "a.name";
-                default -> throw new IllegalArgumentException("Unknown sort property: " + o.getProperty());
+            String path = switch (o.getProperty()) {
+                case "productAttributes.attributeValue.valueNumeric", "valueNumeric" ->
+                        idQuery ? "avSort.valueNumeric" : "av.valueNumeric";
+                case "productAttributes.attributeValue.attribute.name" ->
+                        idQuery ? "paSort.attributeValue.attribute.name"
+                                : "a.name";
+                case "valueString" -> idQuery ? "avSort.valueString" : "av.valueString";
+                case "name" -> "p.name";
+                case "basePrice" -> "p.basePrice";
+                case "brand.name" -> "b.name";
+                case "manufacturer.name" -> "m.name";
+                case "currentPriceHistory.price", "currentPrice" -> "cph.price";
+                default -> throw new IllegalArgumentException("Unknown sort: " + o.getProperty());
             };
-            clauses.add(aliasPath + " " + o.getDirection().name());
+            clauses.add(path + " " + o.getDirection());
         }
-        return " ORDER BY " + String.join(", ", clauses) + " ";
+        return " ORDER BY " + String.join(", ", clauses);
     }
 
-    // ----------------------------------------------------------------
-    // Builder classes for DTO grouping
-    // ----------------------------------------------------------------
+    // Builder classes unchanged…
     private static class ProductDtoBuilder {
         private final Long id;
         private final String name;
         private final List<AttributeDto> attrs = new ArrayList<>();
 
         ProductDtoBuilder(Long id, String name) {
-            this.id   = id;
+            this.id = id;
             this.name = name;
         }
 

@@ -1,6 +1,7 @@
 package com.ferozfaiz.product.product;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author Feroz Faiz
@@ -13,13 +14,14 @@ public class ProductFilter {
     private String brandName;
     private String manufacturerName;
     private String attributeName;
-    private BigDecimal attributeValueNumeric;
+    private List<BigDecimal> attributeValueNumeric;
+    private List<String> attributeValueString;
 
-    public BigDecimal getAttributeValueNumeric() {
+    public List<BigDecimal> getAttributeValueNumeric() {
         return attributeValueNumeric;
     }
 
-    public void setAttributeValueNumeric(BigDecimal attributeValueNumeric) {
+    public void setAttributeValueNumeric(List<BigDecimal> attributeValueNumeric) {
         this.attributeValueNumeric = attributeValueNumeric;
     }
 
@@ -77,5 +79,13 @@ public class ProductFilter {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<String> getAttributeValueString() {
+        return attributeValueString;
+    }
+
+    public void setAttributeValueString(List<String> attributeValueString) {
+        this.attributeValueString = attributeValueString;
     }
 }

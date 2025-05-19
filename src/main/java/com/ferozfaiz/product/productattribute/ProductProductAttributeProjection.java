@@ -14,6 +14,6 @@ public interface ProductProductAttributeProjection {
     ProductAttributeValue getAttributeValue();
 
     // new method—no dots in the name!—that returns the full ProductAttribute
-    @Value("#{target.attributeValue.attribute}")
+    @Value("#{target.attributeValueNumeric.attribute}")
     ProductAttribute getAttribute();
 }

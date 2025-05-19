@@ -45,9 +45,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer>,JpaSp
 //            "brand",
             "currentPriceHistory",
             "productAttributes",
-            "productAttributes.attributeValue",                           // nested
-            "productAttributes.attributeValue.attribute",                  // deeper nested
-            "productAttributes.attributeValue.measurementUnit"             // measurement unit
+            "productAttributes.attributeValueNumeric",                           // nested
+            "productAttributes.attributeValueNumeric.attribute",                  // deeper nested
+            "productAttributes.attributeValueNumeric.measurementUnit"             // measurement unit
     })
     Page<Product> findAll(Pageable pageable);
     @Override
@@ -56,9 +56,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer>,JpaSp
 //            "manufacturer",
             "currentPriceHistory",
             "productAttributes",
-            "productAttributes.attributeValue",                           // nested
-            "productAttributes.attributeValue.attribute",                  // deeper nested
-            "productAttributes.attributeValue.measurementUnit"             // measurement unit
+            "productAttributes.attributeValueNumeric",                           // nested
+            "productAttributes.attributeValueNumeric.attribute",                  // deeper nested
+            "productAttributes.attributeValueNumeric.measurementUnit"             // measurement unit
     })
     Page<Product> findAll(Specification<Product> spec, Pageable pageable);
 
@@ -67,7 +67,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer>,JpaSp
 //        // bind nested attribute name
 //        bindings.bind(root.productAttributes
 //                        .any()
-//                        .attributeValue
+//                        .attributeValueNumeric
 //                        .attribute
 //                        .name)
 //                .first((path, value) -> path.eq(value));
@@ -75,7 +75,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer>,JpaSp
 //        // bind nested numeric value
 //        bindings.bind(root.productAttributes
 //                        .any()
-//                        .attributeValue
+//                        .attributeValueNumeric
 //                        .valueNumeric)
 //                .first((path, value) -> path.eq(value));
 //    }
@@ -93,11 +93,11 @@ public interface ProductRepository extends JpaRepository<Product, Integer>,JpaSp
 
     /**
      * Bind the ‘attributeName’ filter so that
-     * ?productAttributes.attributeValue.attribute.name=Width
+     * ?productAttributes.attributeValueNumeric.attribute.name=Width
      * becomes a Predicate on `a.name.eq("Width")`.
      */
 //    @Override
 //    default void customize(QuerydslBindings bindings, QProduct root) {
-//        bindings.bind(root.productAttributes.any().attributeValue.attribute.name).first((path, value) -> path.eq(value));
+//        bindings.bind(root.productAttributes.any().attributeValueNumeric.attribute.name).first((path, value) -> path.eq(value));
 //    }
 }

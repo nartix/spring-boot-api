@@ -24,9 +24,9 @@ public final class ProductSpecs {
                 root.fetch("manufacturer", JoinType.LEFT);
                 root.fetch("currentPriceHistory", JoinType.LEFT);
 
-                // productAttributes → attributeValue → attribute
+                // productAttributes → attributeValueNumeric → attribute
                 Fetch<Product, ?> paFetch = root.fetch("productAttributes", JoinType.LEFT);
-                Fetch<?, ?> avFetch = paFetch.fetch("attributeValue", JoinType.LEFT);
+                Fetch<?, ?> avFetch = paFetch.fetch("attributeValueNumeric", JoinType.LEFT);
                 avFetch.fetch("attribute", JoinType.LEFT);
 
                 query.distinct(true);
