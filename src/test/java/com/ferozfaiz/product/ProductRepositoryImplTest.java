@@ -8,6 +8,7 @@ import com.ferozfaiz.product.manufacturer.ProductManufacturer;
 import com.ferozfaiz.product.measurementunit.ProductMeasurementUnit;
 import com.ferozfaiz.product.product.*;
 import com.ferozfaiz.product.productattribute.ProductProductAttribute;
+import com.ferozfaiz.product.productpricehistory.ProductPriceHistory;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +22,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -126,6 +129,37 @@ class ProductRepositoryImplTest {
         ProductAttributeValue sL3 = makeAV.apply(size, mm);
         sL3.setValueNumeric(3.0);
         sL3.setValueString("L");
+
+        // ——— Price History ———
+        LocalDateTime now = LocalDateTime.now();
+
+        // p1 history + current
+        em.persist(new ProductPriceHistory(p1,
+                BigDecimal.valueOf(8.50), now.minusDays(30), now.minusDays(15), false));
+        em.persist(new ProductPriceHistory(p1,
+                BigDecimal.valueOf(9.50), now.minusDays(15), now.minusDays(1), false));
+        em.persist(new ProductPriceHistory(p1,
+                BigDecimal.valueOf(10.00), now.minusDays(1), null, true));
+
+        // p2 history + current
+        em.persist(new ProductPriceHistory(p2,
+                BigDecimal.valueOf(11.00), now.minusDays(20), now.minusDays(5), false));
+        em.persist(new ProductPriceHistory(p2,
+                BigDecimal.valueOf(12.00), now.minusDays(5), null, true));
+
+        // p3 history + current
+        em.persist(new ProductPriceHistory(p3,
+                BigDecimal.valueOf(7.00), now.minusDays(25), now.minusDays(10), false));
+        em.persist(new ProductPriceHistory(p3,
+                BigDecimal.valueOf(8.00), now.minusDays(10), null, true));
+
+        // p4 history + current
+        em.persist(new ProductPriceHistory(p4,
+                BigDecimal.valueOf(5.00), now.minusDays(7), now.minusDays(2), false));
+        em.persist(new ProductPriceHistory(p4,
+                BigDecimal.valueOf(5.50), now.minusDays(2), null, true));
+
+        // p5 is intentionally left without any ProductPriceHistory records
 
         em.persist(new ProductProductAttribute(p1, sM2));
         em.persist(new ProductProductAttribute(p2, sL3));
@@ -371,6 +405,70 @@ class ProductRepositoryImplTest {
         List<ProductDto> dtos = repo.findAllByFilter(filter, page).getContent();
 
         // check for name == Gadget
+        assertThat(dtos.get(0).name()).isEqualTo("Gadget");
+    }
+
+    @Test
+    @Order(101)
+    @DisplayName("10.1 Sort by price descending, last is null")
+    void whenSortByPriceDesc_thenCorrectOrder() {
+        var filter = new ProductFilter();
+        Pageable page = PageRequest.of(0, 10, Sort.by("price").descending());
+        List<ProductDto> dtos = repo.findAllByFilter(filter, page).getContent();
+
+        List<BigDecimal> prices = dtos.stream()
+                .map(ProductDto::price)
+                .toList();
+
+        // sort nulls last, then reverse
+        List<BigDecimal> expected = new ArrayList<>(prices);
+        expected.sort(Comparator.nullsLast(Comparator.reverseOrder()));
+
+        assertThat(prices)
+                .withFailMessage("Expected %s to be in descending order with nulls last", prices)
+                .isEqualTo(expected);
+
+        // the last record should be the one with a null price
+        assertThat(prices.get(prices.size() - 1))
+                .withFailMessage("Expected last price to be null but was %s", prices.get(prices.size() - 1))
+                .isNull();
+    }
+
+    @Test
+    @Order(102)
+    @DisplayName("10.2 Sort by price ascending, first is null")
+    void whenSortByPriceAsc_thenCorrectOrder() {
+        var filter = new ProductFilter();
+        Pageable page = PageRequest.of(0, 10, Sort.by("price").ascending());
+        List<ProductDto> dtos = repo.findAllByFilter(filter, page).getContent();
+
+        List<BigDecimal> prices = dtos.stream()
+                .map(ProductDto::price)
+                .toList();
+
+        // the null‐priced record should come first
+        assertThat(prices.get(0)).isNull();
+
+        // all non‐null prices should be in ascending order
+        List<BigDecimal> nonNull = prices.stream()
+                .filter(Objects::nonNull)
+                .toList();
+        List<BigDecimal> sortedAsc = new ArrayList<>(nonNull);
+        sortedAsc.sort(Comparator.naturalOrder());
+        assertThat(nonNull)
+                .withFailMessage("Expected non‐null prices %s to be in ascending order", nonNull)
+                .isEqualTo(sortedAsc);
+    }
+
+    @Test
+    @Order(103)
+    @DisplayName("10.3 Sort by price desc then name asc, first is Gadget")
+    void whenSortByPriceDescAndNameAsc_thenCorrectOrder() {
+        var filter = new ProductFilter();
+        Pageable page = PageRequest.of(0, 10,
+                Sort.by("price").descending().and(Sort.by("name").ascending()));
+        List<ProductDto> dtos = repo.findAllByFilter(filter, page).getContent();
+
         assertThat(dtos.get(0).name()).isEqualTo("Gadget");
     }
 

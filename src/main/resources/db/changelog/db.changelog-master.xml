@@ -398,8 +398,6 @@
                 <constraints nullable="false"/>
             </column>
             <column name="value_string" type="VARCHAR(255)"/>
-<!--            For money, use NUMERIC(12,2) or DECIMAL(12,2) for better precision-->
-<!--            <column name="value_numeric" type="NUMERIC(12,2)"/>-->
             <column name="value_numeric" type="FLOAT"/>
             <column name="value_boolean" type="BOOLEAN"/>
             <column name="measurement_unit_id" type="INT"/>
@@ -586,5 +584,12 @@
                 referencedTableName="product_product"
                 referencedColumnNames="id"
                 onDelete="CASCADE"/>
+    </changeSet>
+    <changeSet id="idx_pph_product_end_date" author="Feroz">
+        <createIndex indexName="product_productpricehistory_product_end_date_idx"
+                     tableName="product_productpricehistory">
+            <column name="product_id"/>
+            <column name="end_date" descending="true"/>
+        </createIndex>
     </changeSet>
 </databaseChangeLog>

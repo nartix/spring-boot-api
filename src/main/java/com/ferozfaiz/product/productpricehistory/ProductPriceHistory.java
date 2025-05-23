@@ -24,6 +24,10 @@ import java.time.LocalDateTime;
                 @Index(
                         name = "product_productpricehistory_is_current_idx",
                         columnList = "is_current"
+                ),
+                @Index(
+                        name = "product_productpricehistory_product_end_date_idx",
+                        columnList = "product_id, end_date"
                 )
         }
 )

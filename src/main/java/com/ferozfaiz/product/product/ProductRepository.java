@@ -22,9 +22,11 @@ import java.util.Optional;
  * skips sorting and filtering on the query.
  * Also, deeply nested ordering is not supported and ignored by Spring Data REST.
  * I created a custom API to handle this.
+ * Tried JpaSpecificationExecutor but it also runs into the same issues.
+ * Decided not use QueryDSL as it is not beeing maintained properly.
  */
 @RepositoryRestResource(collectionResourceRel = "products", path = "products", excerptProjection = ProductProjection.class)
-public interface ProductRepository extends JpaRepository<Product, Integer>,JpaSpecificationExecutor<Product>, ProductRepositoryCustom  {
+public interface ProductRepository extends JpaRepository<Product, Integer>, JpaSpecificationExecutor<Product>, ProductRepositoryCustom {
 // public interface ProductRepository extends JpaRepository<Product, Integer>, QuerydslPredicateExecutor<Product>, QuerydslBinderCustomizer<QProduct>, ProductRepositoryCustom, JpaSpecificationExecutor<Product> {
 //public interface ProductRepository extends JpaRepository<Product, Integer>, QuerydslPredicateExecutor<Product>,
 //        QuerydslBinderCustomizer<QProduct> {
@@ -50,6 +52,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer>,JpaSp
             "productAttributes.attributeValueNumeric.measurementUnit"             // measurement unit
     })
     Page<Product> findAll(Pageable pageable);
+
     @Override
     @EntityGraph(attributePaths = {
 //            "brand",

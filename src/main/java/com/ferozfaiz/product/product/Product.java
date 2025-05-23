@@ -6,9 +6,6 @@ import com.ferozfaiz.product.manufacturer.ProductManufacturer;
 import com.ferozfaiz.product.productattribute.ProductProductAttribute;
 import com.ferozfaiz.product.productpricehistory.ProductPriceHistory;
 import jakarta.persistence.*;
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
 import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.math.BigDecimal;
@@ -60,7 +57,7 @@ public class Product {
     @Column(length = 255)
     private String slug;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "brand_id",
             foreignKey = @ForeignKey(
@@ -72,7 +69,7 @@ public class Product {
     @RestResource(exported = false)
     private ProductBrand brand;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "manufacturer_id",
             foreignKey = @ForeignKey(
@@ -84,34 +81,44 @@ public class Product {
     @RestResource(exported = false)
     private ProductManufacturer manufacturer;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumnsOrFormulas({
-            // 1) map this entity's PK (p.id) to the FK column (h.product_id)
-            @JoinColumnOrFormula(
-                    column = @JoinColumn(
-                            name = "id",
-                            referencedColumnName = "product_id",
-                            insertable = false,   // if you don't want to write through
-                            updatable = false
-                    )
-            ),
+//    @OneToOne(fetch = FetchType.EAGER)
+//    @JoinColumnsOrFormulas({
+//            // 1) map this entity's PK (p.id) to the FK column (h.product_id)
+//            @JoinColumnOrFormula(
+//                    column = @JoinColumn(
+//                            name = "id",
+//                            referencedColumnName = "product_id",
+//                            insertable = false,   // if you don't want to write through
+//                            updatable = false
+//                    )
+//            ),
             // 2) restrict to the row where is_current = true
-            @JoinColumnOrFormula(
-                    formula = @JoinFormula(
-                            value = "true",
-                            referencedColumnName = "is_current"
-                    )
-            )
-    })
+            // else there will be duplicate rows
+//            @JoinColumnOrFormula(
+//                    formula = @JoinFormula(
+//                            value = "true",
+//                            referencedColumnName = "is_current"
+//                    )
+//            ),
+//            @JoinColumnOrFormula(
+//                    formula = @JoinFormula(
+//                            value = "is_current = true OR end_date IS NULL OR end_date > NOW()",
+//                            referencedColumnName = "true"
+//                    )
+//            )
+//    })
     @RestResource(exported = false)
-    @JsonManagedReference
+//    @JsonManagedReference()
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "product")
+//    @SQLRestriction("is_current = true OR end_date IS NULL OR end_date > NOW()")
+//    @SQLJoinTableRestriction("is_current = true OR end_date IS NULL OR end_date > NOW()")
     private ProductPriceHistory currentPriceHistory;
 
     public ProductPriceHistory getCurrentPriceHistory() {
         return currentPriceHistory;
     }
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     @RestResource(exported = false)
     @JsonManagedReference
     private Set<ProductProductAttribute> productAttributes = new HashSet<>();

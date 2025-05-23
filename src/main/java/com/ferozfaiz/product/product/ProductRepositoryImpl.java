@@ -7,15 +7,20 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 // http://localhost:8080/api/products?sort=valueNumeric,desc&attributeName=Width&attributeValueNumeric=55&&attributeValueNumeric=5
+// http://localhost:8080/api/products?sort=valueNumeric,asc&attributeName=Dimension&sort=name,asc
 
 /**
  * @author Feroz
@@ -24,8 +29,17 @@ import java.util.*;
 @Primary
 public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ProductRepositoryImpl.class);
+
     @PersistenceContext
     private EntityManager em;
+
+    // i want to access environment variable class
+    private final Environment env;
+
+    public ProductRepositoryImpl(Environment env) {
+        this.env = env;
+    }
 
     @Override
     public Page<ProductDto> findAllByFilter(ProductFilter filter, Pageable pageable) {
@@ -34,7 +48,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 + " FROM Product p"
                 + " LEFT JOIN p.brand b"
                 + " LEFT JOIN p.manufacturer m"
-                + " LEFT JOIN p.currentPriceHistory cph";
+                + " LEFT JOIN p.currentPriceHistory cph"
+                + "   WITH (cph.isCurrent = true OR cph.endDate IS NULL OR cph.endDate >= CURRENT_TIMESTAMP )";
 
         // 2) Dynamic WHERE (note: we no longer filter out products missing the attribute)
         StringBuilder where = new StringBuilder(" WHERE 1=1");
@@ -154,6 +169,13 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             return new PageImpl<>(Collections.emptyList(), pageable, total);
         }
 
+        if (env.acceptsProfiles(Profiles.of("dev"))) {
+            String formattedIds = ids.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(", "));
+            log.info("Retrieved product IDs: [{}]", formattedIds);
+        }
+
         // 6) Fetch *all* attributes for those IDs
         String dataJoins = ""
                 + baseJoins
@@ -169,7 +191,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 + "  a.name              AS attributeName,"
                 + "  av.valueNumeric     AS attributeValueNumeric,"
                 + "  av.valueString      AS attributeValueString,"
-                + "  mu.symbol           AS measurementUnitSymbol"
+                + "  mu.symbol           AS measurementUnitSymbol,"
+                + "  cph.price           AS price"
                 + dataJoins
                 + " WHERE p.id IN :ids";
 
@@ -185,7 +208,11 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             Long pid = t.get("id", Long.class);
             var builder = productMap.get(pid);
             if (builder == null) {
-                builder = new ProductDtoBuilder(pid, t.get("name", String.class));
+                builder = new ProductDtoBuilder(
+                        pid,
+                        t.get("name", String.class),
+                        t.get("price", BigDecimal.class)
+                );
                 productMap.put(pid, builder);
             }
             Double value = Optional.ofNullable(t.get("attributeValueNumeric", Number.class))
@@ -224,7 +251,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 case "basePrice" -> "p.basePrice";
                 case "brand.name" -> "b.name";
                 case "manufacturer.name" -> "m.name";
-                case "currentPriceHistory.price", "currentPrice" -> "cph.price";
+                case "currentPriceHistory.price", "currentPrice", "price" -> "cph.price";
                 default -> throw new IllegalArgumentException("Unknown sort: " + o.getProperty());
             };
             clauses.add(path + " " + o.getDirection());
@@ -236,11 +263,13 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     private static class ProductDtoBuilder {
         private final Long id;
         private final String name;
+        private final BigDecimal price;
         private final List<AttributeDto> attrs = new ArrayList<>();
 
-        ProductDtoBuilder(Long id, String name) {
+        ProductDtoBuilder(Long id, String name, BigDecimal price) {
             this.id = id;
             this.name = name;
+            this.price = price;
         }
 
         void addAttribute(AttributeDto dto) {
@@ -248,7 +277,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         }
 
         ProductDto build() {
-            return new ProductDto(id, name, attrs);
+            return new ProductDto(id, name, price, attrs);
         }
     }
 }

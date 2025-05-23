@@ -2,6 +2,7 @@ package com.ferozfaiz.product.product;
 
 import com.ferozfaiz.product.attribute.AttributeDto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -26,6 +27,7 @@ import java.util.List;
 public record ProductDto(
         Long id,
         String name,
+        BigDecimal price,
         List<AttributeDto> attributes
 ) {}
 
