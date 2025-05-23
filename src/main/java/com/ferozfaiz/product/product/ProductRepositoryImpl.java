@@ -1,10 +1,12 @@
 package com.ferozfaiz.product.product;
 
 
+import com.ferozfaiz.product.attribute.AttributeDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import java.util.*;
  * @author Feroz
  */
 @Repository
+@Primary
 public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     @PersistenceContext
@@ -154,9 +157,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         // 6) Fetch *all* attributes for those IDs
         String dataJoins = ""
                 + baseJoins
-                + " JOIN p.productAttributes pa"
-                + " JOIN pa.attributeValue av"
-                + " JOIN av.attribute a"
+                + " LEFT JOIN p.productAttributes pa"
+                + " LEFT JOIN pa.attributeValue av"
+                + " LEFT JOIN av.attribute a"
                 + " LEFT JOIN av.measurementUnit mu";
 
         String dataJpql = ""

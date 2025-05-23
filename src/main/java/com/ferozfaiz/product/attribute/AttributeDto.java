@@ -1,4 +1,4 @@
-package com.ferozfaiz.product.product;
+package com.ferozfaiz.product.attribute;
 
 // Nested attribute DTO
 public record AttributeDto(

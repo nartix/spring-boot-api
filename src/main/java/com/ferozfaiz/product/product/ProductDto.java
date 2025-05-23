@@ -1,5 +1,7 @@
 package com.ferozfaiz.product.product;
 
+import com.ferozfaiz.product.attribute.AttributeDto;
+
 import java.util.List;
 
 /**

@@ -2,6 +2,7 @@ package com.ferozfaiz.product.attributevalue;
 
 import com.ferozfaiz.product.attribute.ProductAttribute;
 import com.ferozfaiz.product.measurementunit.ProductMeasurementUnit;
+import com.ferozfaiz.product.product.Product;
 import jakarta.persistence.*;
 import org.springframework.data.rest.core.annotation.RestResource;
 
@@ -57,7 +58,8 @@ public class ProductAttributeValue {
     @RestResource(exported = false)
     private ProductMeasurementUnit measurementUnit;
 
-    public ProductAttributeValue() {}
+    public ProductAttributeValue() {
+    }
 
     public ProductAttributeValue(
             ProductAttribute attribute,
@@ -70,6 +72,9 @@ public class ProductAttributeValue {
         this.valueNumeric = valueNumeric;
         this.valueBoolean = valueBoolean;
         this.measurementUnit = measurementUnit;
+    }
+
+    public ProductAttributeValue(ProductAttribute color, Object o, String red, Object o1) {
     }
 
     // — Getters & setters —

@@ -149,6 +149,11 @@
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>com.querydsl</groupId>-->
 <!--			<artifactId>querydsl-jpa</artifactId>-->
@@ -210,6 +215,16 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>
+						-javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
+						-Xshare:off
+					</argLine>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 <!--					<annotationProcessorPaths>-->
@@ -245,7 +260,7 @@
 					<generatedSourcesDirectory>target/generated-sources</generatedSourcesDirectory>
 					<source>23</source>
 					<target>23</target>
-					<compilerArgs>--enable-preview</compilerArgs>
+<!--					<compilerArgs>&#45;&#45;enable-preview</compilerArgs>-->
 				</configuration>
 			</plugin>
 		</plugins>

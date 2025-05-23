@@ -24,8 +24,8 @@ import java.util.Set;
 @Table(
         name = "product_product",
         indexes = {
-                @Index(name = "product_product_name_idx",     columnList = "name"),
-                @Index(name = "product_product_slug_idx",     columnList = "slug"),
+                @Index(name = "product_product_name_idx", columnList = "name"),
+                @Index(name = "product_product_slug_idx", columnList = "slug"),
                 @Index(name = "product_product_base_price_idx", columnList = "base_price"),
                 @Index(name = "product_product_is_active_idx", columnList = "is_active")
         }
@@ -119,13 +119,29 @@ public class Product {
     public Set<ProductProductAttribute> getProductAttributes() {
         return productAttributes;
     }
+
     public void setProductAttributes(Set<ProductProductAttribute> productAttributes) {
         this.productAttributes = productAttributes;
     }
 
-    public Product() {}
+    public Product() {
+    }
 
-    // Constructors, getters & setters
+    public Product(String name) {
+        this.name = name;
+    }
+
+    public Product(String name,
+                   BigDecimal basePrice,
+                   Boolean isActive,
+                   ProductBrand brand,
+                   ProductManufacturer manufacturer) {
+        this.name = name;
+        this.basePrice = basePrice;
+        this.isActive = isActive;
+        this.brand = brand;
+        this.manufacturer = manufacturer;
+    }
 
     public Long getId() {
         return id;

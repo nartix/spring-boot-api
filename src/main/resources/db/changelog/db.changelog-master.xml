@@ -398,6 +398,8 @@
                 <constraints nullable="false"/>
             </column>
             <column name="value_string" type="VARCHAR(255)"/>
+<!--            For money, use NUMERIC(12,2) or DECIMAL(12,2) for better precision-->
+<!--            <column name="value_numeric" type="NUMERIC(12,2)"/>-->
             <column name="value_numeric" type="FLOAT"/>
             <column name="value_boolean" type="BOOLEAN"/>
             <column name="measurement_unit_id" type="INT"/>
