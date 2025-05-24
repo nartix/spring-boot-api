@@ -167,7 +167,7 @@ class ProductRepositoryImplTest {
         em.flush();
         em.clear();
     }
-
+    // path: /products
     @Test
     @Order(11)
     @DisplayName("1.1 No filters returns all products")
@@ -181,6 +181,7 @@ class ProductRepositoryImplTest {
         assertThat(result.getContent()).hasSize(5);
     }
 
+    // path /products?name=wid&page=0&size=10
     @Test
     @Order(21)
     @DisplayName("2.1 Name filter is case‐insensitive substring")
@@ -193,6 +194,7 @@ class ProductRepositoryImplTest {
         assertThat(page.getContent().get(0).name()).isEqualTo("Widget");
     }
 
+    // path /products?name=Gadget&page=0&size=10
     @Test
     @Order(22)
     @DisplayName("2.2 Exact name match returns the matching product")
@@ -205,6 +207,7 @@ class ProductRepositoryImplTest {
         assertThat(page.getContent().get(0).name()).isEqualTo("Gadget");
     }
 
+    // path /products?page=0&size=1
     @Test
     @Order(31)
     @DisplayName("3.1 Page size 1 yields five pages of one product each")
@@ -217,6 +220,7 @@ class ProductRepositoryImplTest {
         assertThat(page.getTotalPages()).isEqualTo(5);
     }
 
+    // path /products?page=1&size=2
     @Test
     @Order(32)
     @DisplayName("3.2 Page 1 with size 2 returns 2 products")
@@ -229,6 +233,7 @@ class ProductRepositoryImplTest {
         assertThat(page.getTotalPages()).isEqualTo(3);
     }
 
+    // path /products?page=0&size=1&sort=name,asc
     @Test
     @Order(33)
     @DisplayName("3.3 Returns Doodad as the only product for page 0 (size=1) sorted by name ascending")
@@ -242,6 +247,7 @@ class ProductRepositoryImplTest {
         assertThat(result.getContent().get(0).name()).isEqualTo("Doodad");
     }
 
+    // path /products?page=0&size=1&sort=name,desc
     @Test
     @Order(34)
     @DisplayName("3.4 Returns Widget as the single product for page 0 (size=1) sorted by name descending")
@@ -268,6 +274,7 @@ class ProductRepositoryImplTest {
 //                .allMatch(p -> p >= 5.0 && p <= 15.0);
 //    }
 
+    // path /products?attributeName=Color&attributeValueString=Red
     @Test
     @Order(61)
     @DisplayName("6.1 When filtering by Color='Red', returns only the two red products")
@@ -285,6 +292,7 @@ class ProductRepositoryImplTest {
         );
     }
 
+    // path /products?attributeName=Width&attributeValueNumeric=5&attributeValueNumeric=10
     @Test
     @Order(72)
     @DisplayName("7.2 When filtering by Width = 5 and 10, returns only products with those widths")
@@ -307,6 +315,7 @@ class ProductRepositoryImplTest {
                 });
     }
 
+    // path /products?attributeName=Size&attributeValueString=M&attributeValueNumeric=2
     @Test
     @Order(81)
     @DisplayName("8.1 When filtering Size='M' and numeric Size=2, returns exactly one matching product")
@@ -332,6 +341,7 @@ class ProductRepositoryImplTest {
                 .contains(tuple("Size", 2.0));
     }
 
+    // path /products?attributeName=Width&attributeValueNumeric=5&attributeValueNumeric=10&sort=valueNumeric,desc
     @Test
     @Order(91)
     @DisplayName("9.1 Sort by valueNumeric desc, for AttributeName=Width")
@@ -363,6 +373,7 @@ class ProductRepositoryImplTest {
                 .isEqualTo(sortedDesc);
     }
 
+    // path /products?attributeName=Width&attributeValueNumeric=5&attributeValueNumeric=10&sort=valueNumeric,asc
     @Test
     @Order(92)
     @DisplayName("9.2 Sort by valueNumeric asc, for AttributeName=Width")
@@ -394,6 +405,7 @@ class ProductRepositoryImplTest {
                 .isEqualTo(sortedAsc);
     }
 
+    // path /products?attributeName=Width&sort=valueNumeric,desc,name,asc
     @Test
     @Order(93)
     @DisplayName("9.3 Sort by valueNumeric desc, for AttributeName=Width and sort by name, first result is Gadget, first product have no attribute width")
@@ -408,6 +420,7 @@ class ProductRepositoryImplTest {
         assertThat(dtos.get(0).name()).isEqualTo("Gadget");
     }
 
+    // path /products?sort=price,desc
     @Test
     @Order(101)
     @DisplayName("10.1 Sort by price descending, last is null")
@@ -434,6 +447,7 @@ class ProductRepositoryImplTest {
                 .isNull();
     }
 
+    // path /products?sort=price,asc
     @Test
     @Order(102)
     @DisplayName("10.2 Sort by price ascending, first is null")
@@ -460,6 +474,7 @@ class ProductRepositoryImplTest {
                 .isEqualTo(sortedAsc);
     }
 
+    // path /products?sort=price,desc,name,asc
     @Test
     @Order(103)
     @DisplayName("10.3 Sort by price desc then name asc, first is Gadget")
@@ -472,7 +487,7 @@ class ProductRepositoryImplTest {
         assertThat(dtos.get(0).name()).isEqualTo("Gadget");
     }
 
-
+    // path /product?name=__NO_SUCH__&page=0&size=10
     @Test
     @Order(111)
     @DisplayName("11.1 No matches yields empty page")
@@ -485,6 +500,7 @@ class ProductRepositoryImplTest {
         assertThat(page.getContent()).isEmpty();
     }
 
+    // path /products?sort=BogusProperty,asc
     @Test
     @Order(131)
     @DisplayName("13.1 Unknown sort property throws")

@@ -240,18 +240,25 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         }
         List<String> clauses = new ArrayList<>();
         for (Sort.Order o : sort) {
-            String path = switch (o.getProperty()) {
-                case "productAttributes.attributeValue.valueNumeric", "valueNumeric" ->
+//            String expr;
+            String path = switch (o.getProperty().toLowerCase(Locale.ROOT)) {
+                case "valuenumeric", "attributevaluenumeric" ->
                         idQuery ? "avSort.valueNumeric" : "av.valueNumeric";
-                case "productAttributes.attributeValue.attribute.name" ->
+                case "productattributes.attributevalue.attribute.name" ->
                         idQuery ? "paSort.attributeValue.attribute.name"
                                 : "a.name";
-                case "valueString" -> idQuery ? "avSort.valueString" : "av.valueString";
+                case "valuestring", "attributevaluestring" -> idQuery ? "avSort.valueString" : "av.valueString";
                 case "name" -> "p.name";
-                case "basePrice" -> "p.basePrice";
+                case "baseprice" -> "p.basePrice";
                 case "brand.name" -> "b.name";
                 case "manufacturer.name" -> "m.name";
-                case "currentPriceHistory.price", "currentPrice", "price" -> "cph.price";
+//                case "price" -> {
+//                    // put nulls last when descending, or first when ascending, for example:
+//                    boolean descending = o.isDescending();
+//                    expr = "cph.price "
+//                            + (descending ? " NULLS LAST" : " NULLS FIRST");
+//                }
+                case "currentpricehistory.price", "currentprice", "price" -> "cph.price";
                 default -> throw new IllegalArgumentException("Unknown sort: " + o.getProperty());
             };
             clauses.add(path + " " + o.getDirection());

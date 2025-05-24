@@ -15,6 +15,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
@@ -78,22 +79,56 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 //        exceptionMappers.put(NotFoundException.class, new NotFoundExceptionMapper());
 //        exceptionMappers.put(ValidationException.class, new ValidationExceptionMapper());
         exceptionMappers.put(ResourceNotFoundException.class, new GenericExceptionMapper<>());
-        exceptionMappers.put(AuthenticationFailedException.class, new GenericExceptionMapper<AuthenticationFailedException>(new ErrorDetailsDto("AUTHENTICATION_FAILED", null, HttpStatusCode.valueOf(401))));
-        exceptionMappers.put(DataIntegrityViolationException.class, new GenericExceptionMapper<>(
-                new ErrorDetailsDto("DATA_INTEGRITY_VIOLATION", "error.data.integrity.violation", HttpStatusCode.valueOf(409))
-        ));
-        exceptionMappers.put(
-                org.springframework.data.rest.webmvc.ResourceNotFoundException.class,
-                new GenericExceptionMapper<>(new ErrorDetailsDto("RESOURCE_NOT_FOUND", "error.resource.not.found", HttpStatusCode.valueOf(404)))
+        exceptionMappers.put(AuthenticationFailedException.class,
+                new GenericExceptionMapper<AuthenticationFailedException>(
+                        new ErrorDetailsDto("AUTHENTICATION_FAILED", null, HttpStatusCode.valueOf(401)
+                        )
+                )
+        );
+        exceptionMappers.put(DataIntegrityViolationException.class,
+                new GenericExceptionMapper<>(
+                        new ErrorDetailsDto("DATA_INTEGRITY_VIOLATION", "error.data.integrity.violation", HttpStatusCode.valueOf(409)
+                        )
+                )
+        );
+        exceptionMappers.put(org.springframework.data.rest.webmvc.ResourceNotFoundException.class,
+                new GenericExceptionMapper<>(
+                        new ErrorDetailsDto("RESOURCE_NOT_FOUND", "error.resource.not.found", HttpStatusCode.valueOf(404)
+                        )
+                )
         );
 //        exceptionMappers.put(MethodArgumentNotValidException.class, new MethodArgumentNotValidExceptionMapper(new ErrorDetailsDto("VALIDATION_FAILED", "error.validation.failed", HttpStatusCode.valueOf(400))));
-        exceptionMappers.put(ConstraintViolationException.class, new ConstraintViolationExceptionMapper(new ErrorDetailsDto("VALIDATION_FAILED", "error.validation.failed", HttpStatusCode.valueOf(400)), messageSource));
+        exceptionMappers.put(ConstraintViolationException.class,
+                new ConstraintViolationExceptionMapper(
+                        new ErrorDetailsDto("VALIDATION_FAILED", "error.validation.failed", HttpStatusCode.valueOf(400)
+                        ), messageSource
+                )
+        );
 
         // Register conversion exception mappers for invalid ID format errors
         exceptionMappers.put(MethodArgumentTypeMismatchException.class,
-                new GenericExceptionMapper<>(new ErrorDetailsDto("INVALID_VALUE", "error.invalid.value", HttpStatusCode.valueOf(400))));
+                new GenericExceptionMapper<>(
+                        new ErrorDetailsDto("INVALID_VALUE", "error.invalid.value", HttpStatusCode.valueOf(400)
+                        )
+                )
+        );
         exceptionMappers.put(ConversionFailedException.class,
-                new GenericExceptionMapper<>(new ErrorDetailsDto("INVALID_VALUE", "error.invalid.value", HttpStatusCode.valueOf(400))));
+                new GenericExceptionMapper<>(
+                        new ErrorDetailsDto("INVALID_VALUE", "error.invalid.value", HttpStatusCode.valueOf(400)
+                        )
+                )
+        );
+//        exceptionMappers.put(IllegalArgumentException.class,
+//                new GenericExceptionMapper<>(new ErrorDetailsDto("INVALID_VALUE", "error.invalid.value", HttpStatusCode.valueOf(400))));
+        exceptionMappers.put(InvalidDataAccessApiUsageException.class,
+                new GenericExceptionMapper<>(
+                        new ErrorDetailsDto(
+                                "INVALID_SORT",                 // your external error code
+                                "error.invalid.sort",           // your i18n message key
+                                HttpStatusCode.valueOf(400)     // HTTP 400 Bad Request
+                        )
+                )
+        );
     }
 
     @ExceptionHandler({Throwable.class})
