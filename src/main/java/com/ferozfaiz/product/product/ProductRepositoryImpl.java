@@ -70,13 +70,19 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             where.append(" AND p.isActive = :active");
             params.put("active", filter.getActive());
         }
-        if (filter.getBrandName() != null) {
-            where.append(" AND LOWER(b.name) = LOWER(:brandName)");
-            params.put("brandName", filter.getBrandName());
+        if (filter.getBrandName() != null && !filter.getBrandName().isEmpty()) {
+            List<String> lowered = filter.getBrandName().stream()
+                    .map(String::toLowerCase)
+                    .toList();
+            where.append(" AND LOWER(b.name) IN :brandNames");
+            params.put("brandNames", lowered);
         }
-        if (filter.getManufacturerName() != null) {
-            where.append(" AND LOWER(m.name) = LOWER(:manufacturerName)");
-            params.put("manufacturerName", filter.getManufacturerName());
+        if (filter.getManufacturerName() != null && !filter.getManufacturerName().isEmpty()) {
+            List<String> lowered = filter.getManufacturerName().stream()
+                    .map(String::toLowerCase)
+                    .toList();
+            where.append(" AND LOWER(m.name) IN :manufacturerNames");
+            params.put("manufacturerNames", lowered);
         }
         // … any other filters, but *no* attributeName filter here …
 
@@ -192,7 +198,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 + "  av.valueNumeric     AS attributeValueNumeric,"
                 + "  av.valueString      AS attributeValueString,"
                 + "  mu.symbol           AS measurementUnitSymbol,"
-                + "  cph.price           AS price"
+                + "  cph.price           AS price,"
+                + "  b.name              AS brand,"
+                + "  m.name              AS manufacturer"
                 + dataJoins
                 + " WHERE p.id IN :ids";
 
@@ -211,7 +219,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 builder = new ProductDtoBuilder(
                         pid,
                         t.get("name", String.class),
-                        t.get("price", BigDecimal.class)
+                        t.get("price", BigDecimal.class),
+                        t.get("brand", String.class),
+                        t.get("manufacturer", String.class)
                 );
                 productMap.put(pid, builder);
             }
@@ -242,16 +252,15 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         for (Sort.Order o : sort) {
 //            String expr;
             String path = switch (o.getProperty().toLowerCase(Locale.ROOT)) {
-                case "valuenumeric", "attributevaluenumeric" ->
-                        idQuery ? "avSort.valueNumeric" : "av.valueNumeric";
+                case "valuenumeric", "attributevaluenumeric" -> idQuery ? "avSort.valueNumeric" : "av.valueNumeric";
                 case "productattributes.attributevalue.attribute.name" ->
                         idQuery ? "paSort.attributeValue.attribute.name"
                                 : "a.name";
                 case "valuestring", "attributevaluestring" -> idQuery ? "avSort.valueString" : "av.valueString";
                 case "name" -> "p.name";
                 case "baseprice" -> "p.basePrice";
-                case "brand.name" -> "b.name";
-                case "manufacturer.name" -> "m.name";
+                case "brand.name", "brand", "brandname" -> "b.name";
+                case "manufacturer.name", "manufacturername", "manufacturer" -> "m.name";
 //                case "price" -> {
 //                    // put nulls last when descending, or first when ascending, for example:
 //                    boolean descending = o.isDescending();
@@ -271,12 +280,16 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         private final Long id;
         private final String name;
         private final BigDecimal price;
+        private final String brand;
+        private final String manufacturer;
         private final List<AttributeDto> attrs = new ArrayList<>();
 
-        ProductDtoBuilder(Long id, String name, BigDecimal price) {
+        ProductDtoBuilder(Long id, String name, BigDecimal price, String brand, String manufacturer) {
             this.id = id;
             this.name = name;
             this.price = price;
+            this.brand = brand;
+            this.manufacturer = manufacturer;
         }
 
         void addAttribute(AttributeDto dto) {
@@ -284,7 +297,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         }
 
         ProductDto build() {
-            return new ProductDto(id, name, price, attrs);
+            return new ProductDto(id, name, price, brand, manufacturer, attrs);
         }
     }
 }

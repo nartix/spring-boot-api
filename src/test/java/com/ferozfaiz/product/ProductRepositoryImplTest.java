@@ -66,6 +66,8 @@ class ProductRepositoryImplTest {
 
         ProductManufacturer m1 = new ProductManufacturer("M1");
         em.persist(m1);
+        ProductManufacturer m2 = new ProductManufacturer("M2");
+        em.persist(m2);
 
         // ——— Measurement Unit ———
         ProductMeasurementUnit mm = new ProductMeasurementUnit("Millimeter", "mm", 1.0);
@@ -82,9 +84,9 @@ class ProductRepositoryImplTest {
         // ——— Products ———
         Product p1 = new Product("Widget", BigDecimal.valueOf(10), true, acme, m1);
         Product p2 = new Product("Gadget", BigDecimal.valueOf(12), true, global, m1);
-        Product p3 = new Product("Doodad", BigDecimal.valueOf(8), true, acme, m1);
-        Product p4 = new Product("Thingamajig", BigDecimal.valueOf(5), true, global, m1);
-        Product p5 = new Product("Whatsit", BigDecimal.valueOf(7), true, acme, m1);
+        Product p3 = new Product("Doodad", BigDecimal.valueOf(8), true, acme, m2);
+        Product p4 = new Product("Thingamajig", BigDecimal.valueOf(5), true, null, m1);
+        Product p5 = new Product("Whatsit", BigDecimal.valueOf(7), true, acme, null);
         em.persist(p1);
         em.persist(p2);
         em.persist(p3);
@@ -260,6 +262,261 @@ class ProductRepositoryImplTest {
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).name()).isEqualTo("Widget");
     }
+
+    @Test
+    @Order(41)
+    @DisplayName("4.1 When filtering by brand 'Acme', returns only products with that brand")
+    void whenBrandFilter_thenCorrectProducts() {
+        var filter = new ProductFilter();
+        filter.setBrandName(List.of("Acme")); // brand name is a list
+        Page<ProductDto> page = repo.findAllByFilter(filter, PageRequest.of(0, 10));
+
+        assertThat(page.getTotalElements()).isEqualTo(3);
+        page.getContent().forEach(dto ->
+                assertThat(dto.brand()).isEqualTo("Acme")
+        );
+    }
+
+    @Test
+    @Order(42)
+    @DisplayName("4.2 When filtering by brand 'Acme' and name 'wid', returns only matching product")
+    void whenBrandAndNameFilter_thenCorrectProducts() {
+        var filter = new ProductFilter();
+        filter.setBrandName(List.of("Acme"));
+        filter.setName("wid");
+        Page<ProductDto> page = repo.findAllByFilter(filter, PageRequest.of(0, 10));
+
+        assertThat(page.getTotalElements()).isEqualTo(1);
+        assertThat(page.getContent().get(0).name()).isEqualTo("Widget");
+        assertThat(page.getContent().get(0).brand()).isEqualTo("Acme");
+    }
+
+    @Test
+    @Order(43)
+    @DisplayName("4.3 When filtering by brand 'Acme' and 'Global', returns only matching products")
+    void whenBrandFilterMultiple_thenCorrectProducts() {
+        var filter = new ProductFilter();
+        filter.setBrandName(List.of("Acme", "Global"));
+        Page<ProductDto> page = repo.findAllByFilter(filter, PageRequest.of(0, 10));
+
+        assertThat(page.getTotalElements()).isEqualTo(4);
+        page.getContent().forEach(dto ->
+                assertThat(dto.brand()).isIn("Acme", "Global")
+        );
+    }
+
+
+    @Test
+    @Order(51)
+    @DisplayName("5.1 Sort by brand ascending returns correct order (nulls first)")
+    void whenSortByBrandAsc_thenCorrectOrder() {
+        var filter = new ProductFilter();
+        Pageable pageReq = PageRequest.of(0, 10, Sort.by("brand").ascending());
+        List<ProductDto> dtos = repo.findAllByFilter(filter, pageReq).getContent();
+
+        List<String> brands = dtos.stream()
+                .map(ProductDto::brand)
+                .toList();
+        List<String> sorted = new ArrayList<>(brands);
+
+        // Expect null brands first, then case‐insensitive ascending
+        List<String> expected = new ArrayList<>(brands);
+        expected.sort(Comparator.nullsFirst(String.CASE_INSENSITIVE_ORDER));
+
+        assertThat(brands)
+                .withFailMessage("Expected %s to be in ascending brand order", brands)
+                .isEqualTo(sorted);
+    }
+
+    @Test
+    @Order(52)
+    @DisplayName("5.2 Sort by brand descending returns correct order (nulls last)")
+    void whenSortByBrandDesc_thenCorrectOrder() {
+        var filter = new ProductFilter();
+        Pageable pageReq = PageRequest.of(0, 10, Sort.by("brand").descending());
+        List<ProductDto> dtos = repo.findAllByFilter(filter, pageReq).getContent();
+
+        List<String> brands = dtos.stream()
+                .map(ProductDto::brand)
+                .toList();
+        List<String> sortedDesc = new ArrayList<>(brands);
+
+        // Expect null brands last, then case‐insensitive descending
+        List<String> expectedDesc = new ArrayList<>(brands);
+        expectedDesc.sort(Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER.reversed()));
+
+        assertThat(brands)
+                .withFailMessage("Expected %s to be in descending brand order", brands)
+                .isEqualTo(sortedDesc);
+    }
+
+    // path /products?brandName=acme,global&sort=brandname,asc
+    @Test
+    @Order(53)
+    @DisplayName("5.3 Filter by brand 'Acme' and 'Global' and sort by brand ascending")
+    void whenBrandFilterAndSortByBrandAsc_thenCorrectOrder() {
+        var filter = new ProductFilter();
+        filter.setBrandName(List.of("Acme", "Global"));
+        Pageable pageReq = PageRequest.of(0, 10, Sort.by("brandname").ascending());
+        List<ProductDto> dtos = repo.findAllByFilter(filter, pageReq).getContent();
+
+        List<String> brands = dtos.stream()
+                .map(ProductDto::brand)
+                .toList();
+        List<String> sortedAsc = new ArrayList<>(brands);
+        sortedAsc.sort(String.CASE_INSENSITIVE_ORDER);
+
+        assertThat(brands)
+                .withFailMessage("Expected %s to be in ascending brand order", brands)
+                .isEqualTo(sortedAsc);
+    }
+
+    // path /products?brandName=acme,global&sort=brandname,desc
+    @Test
+    @Order(54)
+    @DisplayName("5.4 Filter by brand 'Acme' and 'Global' and sort by brand descending")
+    void whenBrandFilterAndSortByBrandDesc_thenCorrectOrder() {
+        var filter = new ProductFilter();
+        filter.setBrandName(List.of("Acme", "Global"));
+        Pageable pageReq = PageRequest.of(0, 10, Sort.by("brandname").descending());
+        List<ProductDto> dtos = repo.findAllByFilter(filter, pageReq).getContent();
+
+        List<String> brands = dtos.stream()
+                .map(ProductDto::brand)
+                .toList();
+        List<String> sortedDesc = new ArrayList<>(brands);
+        sortedDesc.sort(String.CASE_INSENSITIVE_ORDER.reversed());
+
+        assertThat(brands)
+                .withFailMessage("Expected %s to be in descending brand order", brands)
+                .isEqualTo(sortedDesc);
+    }
+
+    @Test
+    @Order(151)
+    @DisplayName("15.1 When filtering by manufacturer 'M1', returns only products with that manufacturer")
+    void whenManufacturerFilter_thenCorrectProducts() {
+        var filter = new ProductFilter();
+        filter.setManufacturerName(List.of("M1"));
+        Page<ProductDto> page = repo.findAllByFilter(filter, PageRequest.of(0, 10));
+
+        assertThat(page.getTotalElements()).isEqualTo(3);
+        page.getContent().forEach(dto ->
+                assertThat(dto.manufacturer()).isEqualTo("M1")
+        );
+    }
+
+    @Test
+    @Order(152)
+    @DisplayName("15.2 When filtering by manufacturer 'M2' and name 'doo', returns only matching product")
+    void whenManufacturerAndNameFilter_thenCorrectProducts() {
+        var filter = new ProductFilter();
+        filter.setManufacturerName(List.of("M2"));
+        filter.setName("doo");
+        Page<ProductDto> page = repo.findAllByFilter(filter, PageRequest.of(0, 10));
+
+        assertThat(page.getTotalElements()).isEqualTo(1);
+        assertThat(page.getContent().get(0).name()).isEqualTo("Doodad");
+        assertThat(page.getContent().get(0).manufacturer()).isEqualTo("M2");
+    }
+
+    @Test
+    @Order(153)
+    @DisplayName("15.3 When filtering by manufacturers 'M1' and 'M2', returns only matching products")
+    void whenManufacturerFilterMultiple_thenCorrectProducts() {
+        var filter = new ProductFilter();
+        filter.setManufacturerName(List.of("M1", "M2"));
+        Page<ProductDto> page = repo.findAllByFilter(filter, PageRequest.of(0, 10));
+
+        assertThat(page.getTotalElements()).isEqualTo(4);
+        page.getContent().forEach(dto ->
+                assertThat(dto.manufacturer()).isIn("M1", "M2")
+        );
+    }
+
+    @Test
+    @Order(154)
+    @DisplayName("15.4 Sort by manufacturer ascending returns correct order (nulls first)")
+    void whenSortByManufacturerAsc_thenCorrectOrder() {
+        var filter = new ProductFilter();
+        Pageable pageReq = PageRequest.of(0, 10, Sort.by("manufacturerName").ascending());
+        List<ProductDto> dtos = repo.findAllByFilter(filter, pageReq).getContent();
+
+        List<String> manufacturers = dtos.stream()
+                .map(ProductDto::manufacturer)
+                .toList();
+
+        List<String> expected = new ArrayList<>(manufacturers);
+        expected.sort(Comparator.nullsFirst(String.CASE_INSENSITIVE_ORDER));
+
+        assertThat(manufacturers)
+                .withFailMessage("Expected %s to be sorted with nulls first then ascending", manufacturers)
+                .isEqualTo(expected);
+    }
+
+    @Test
+    @Order(155)
+    @DisplayName("15.5 Sort by manufacturer descending returns correct order (nulls last)")
+    void whenSortByManufacturerDesc_thenCorrectOrder() {
+        var filter = new ProductFilter();
+        Pageable pageReq = PageRequest.of(0, 10, Sort.by("manufacturer").descending());
+        List<ProductDto> dtos = repo.findAllByFilter(filter, pageReq).getContent();
+
+        List<String> manufacturers = dtos.stream()
+                .map(ProductDto::manufacturer)
+                .toList();
+
+        List<String> expected = new ArrayList<>(manufacturers);
+        expected.sort(Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER.reversed()));
+
+        assertThat(manufacturers)
+                .withFailMessage("Expected %s to be sorted with nulls last then descending", manufacturers)
+                .isEqualTo(expected);
+    }
+
+    @Test
+    @Order(156)
+    @DisplayName("15.6 Filter by 'M1','M2' and sort by manufacturer ascending returns correct order")
+    void whenManufacturerFilterAndSortByManufacturerAsc_thenCorrectOrder() {
+        var filter = new ProductFilter();
+        filter.setManufacturerName(List.of("M1", "M2"));
+        Pageable pageReq = PageRequest.of(0, 10, Sort.by("manufacturer").ascending());
+        List<ProductDto> dtos = repo.findAllByFilter(filter, pageReq).getContent();
+
+        List<String> manufacturers = dtos.stream()
+                .map(ProductDto::manufacturer)
+                .toList();
+
+        List<String> expected = new ArrayList<>(manufacturers);
+        expected.sort(String.CASE_INSENSITIVE_ORDER);
+
+        assertThat(manufacturers)
+                .withFailMessage("Expected %s to be in ascending order", manufacturers)
+                .isEqualTo(expected);
+    }
+
+    @Test
+    @Order(157)
+    @DisplayName("15.7 Filter by 'M1','M2' and sort by manufacturer descending returns correct order")
+    void whenManufacturerFilterAndSortByManufacturerDesc_thenCorrectOrder() {
+        var filter = new ProductFilter();
+        filter.setManufacturerName(List.of("M1", "M2"));
+        Pageable pageReq = PageRequest.of(0, 10, Sort.by("manufacturer").descending());
+        List<ProductDto> dtos = repo.findAllByFilter(filter, pageReq).getContent();
+
+        List<String> manufacturers = dtos.stream()
+                .map(ProductDto::manufacturer)
+                .toList();
+
+        List<String> expected = new ArrayList<>(manufacturers);
+        expected.sort(String.CASE_INSENSITIVE_ORDER.reversed());
+
+        assertThat(manufacturers)
+                .withFailMessage("Expected %s to be in descending order", manufacturers)
+                .isEqualTo(expected);
+    }
+
+
 
 //    @Test
 //    @DisplayName("3.3 Between min & max price")

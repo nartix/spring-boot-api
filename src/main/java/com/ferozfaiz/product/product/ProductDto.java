@@ -28,6 +28,8 @@ public record ProductDto(
         Long id,
         String name,
         BigDecimal price,
+        String brand,
+        String manufacturer,
         List<AttributeDto> attributes
 ) {}
 

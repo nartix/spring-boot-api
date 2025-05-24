@@ -11,8 +11,8 @@ public class ProductFilter {
     private BigDecimal minBasePrice;
     private BigDecimal maxBasePrice;
     private Boolean active;
-    private String brandName;
-    private String manufacturerName;
+    private List<String> brandName;
+    private List<String> manufacturerName;
     private String attributeName;
     private List<BigDecimal> attributeValueNumeric;
     private List<String> attributeValueString;
@@ -33,19 +33,19 @@ public class ProductFilter {
         this.attributeName = attributeName;
     }
 
-    public String getManufacturerName() {
+    public List<String> getManufacturerName() {
         return manufacturerName;
     }
 
-    public void setManufacturerName(String manufacturerName) {
+    public void setManufacturerName(List<String> manufacturerName) {
         this.manufacturerName = manufacturerName;
     }
 
-    public String getBrandName() {
+    public List<String> getBrandName() {
         return brandName;
     }
 
-    public void setBrandName(String brandName) {
+    public void setBrandName(List<String> brandName) {
         this.brandName = brandName;
     }
 
