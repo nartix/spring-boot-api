@@ -17,6 +17,8 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 // http://localhost:8080/api/products?sort=valueNumeric,desc&attributeName=Width&attributeValueNumeric=55&&attributeValueNumeric=5
@@ -141,6 +143,36 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             where.append(")\n");
         }
 
+
+        List<ProductFilter.AttributeCriteria> crits = filter.getAttributeCriteria();
+        for (int i = 0; i < crits.size(); i++) {
+            var ac = crits.get(i);
+            String nameParam = "attrName" + i;
+            where.append("""
+                        AND EXISTS (
+                          SELECT pa%s FROM p.productAttributes pa%s
+                          JOIN pa%s.attributeValue av%s
+                         WHERE LOWER(av%s.attribute.name) = LOWER(:%s)
+                    """.formatted(i, i, i, i, i, nameParam));
+            params.put(nameParam, ac.getName());
+
+            if (ac.getValueStrings() != null && !ac.getValueStrings().isEmpty()) {
+                String strParam = "stringVals" + i;
+                where.append("    AND LOWER(av%s.valueString) IN :%s\n".formatted(i, strParam));
+                params.put(strParam,
+                        ac.getValueStrings().stream()
+                                .map(String::toLowerCase)
+                                .toList());
+            }
+            if (ac.getValueNumerics() != null && !ac.getValueNumerics().isEmpty()) {
+                String numParam = "numVals" + i;
+                where.append("    AND av%s.valueNumeric IN :%s\n".formatted(i, numParam));
+                params.put(numParam, ac.getValueNumerics());
+            }
+            where.append(") ");
+        }
+
+
         // 3) Total count on all matching products
         String countJpql = "SELECT COUNT(p.id)" + baseJoins + where;
         TypedQuery<Long> countQ = em.createQuery(countJpql, Long.class);
@@ -148,13 +180,52 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         long total = countQ.getSingleResult();
 
         // 4) Build a LEFT JOIN … WITH … for sorting by the chosen attribute
-        String sortJoins = "";
-        if (filter.getAttributeName() != null) {
-            sortJoins = ""
-                    + " LEFT JOIN p.productAttributes paSort"
-                    + "   WITH LOWER(paSort.attributeValue.attribute.name) = LOWER(:attributeName)"
-                    + " LEFT JOIN paSort.attributeValue avSort";
-            params.put("attributeName", filter.getAttributeName());
+//        String sortJoins = "";
+//        if (filter.getAttributeName() != null) {
+//            sortJoins = ""
+//                    + " LEFT JOIN p.productAttributes paSort"
+//                    + "   WITH LOWER(paSort.attributeValue.attribute.name) = LOWER(:attributeName)"
+//                    + " LEFT JOIN paSort.attributeValue avSort";
+//            params.put("attributeName", filter.getAttributeName());
+//        }
+
+        // 4) Build dynamic sort‐joins
+        StringBuilder sortJoins = new StringBuilder();
+        List<Sort.Order> orders = pageable.getSort().toList();
+
+        for (int i = 0; i < orders.size(); i++) {
+            Sort.Order o = orders.get(i);
+            String prop = o.getProperty().toLowerCase(Locale.ROOT);
+
+            // look for attributeCriteria[index].valueNumeric
+            Matcher mNum = Pattern.compile("^attributecriteria\\[(\\d+)\\]\\.valuenumeric$")
+                    .matcher(prop);
+            Matcher mStr = Pattern.compile("^attributecriteria\\[(\\d+)\\]\\.valuestring$")
+                    .matcher(prop);
+
+            if (mNum.matches() || mStr.matches()) {
+                int critIndex = Integer.parseInt(
+                        mNum.matches() ? mNum.group(1) : mStr.group(1)
+                );
+
+                String paAlias = "paSort" + critIndex;
+                String avAlias = "avSort" + critIndex;
+
+// 1) join on the right criterion name
+                sortJoins.append("""
+                        LEFT JOIN p.productAttributes %s
+                          WITH LOWER(%s.attributeValue.attribute.name) = LOWER(:attrName%s)
+                        """.formatted(paAlias, paAlias, critIndex));
+
+                // 2) then join its value
+                sortJoins.append(" LEFT JOIN " + paAlias + ".attributeValue " + avAlias + "\n");
+
+                // we’ll bind :attrName{critIndex} from your filter attributeCriteria list
+                params.put("attrName" + critIndex,
+                        filter.getAttributeCriteria()
+                                .get(critIndex)
+                                .getName());
+            }
         }
 
         // 5) ID query: apply pagination + sort on avSort.valueNumeric (NULL when missing)
@@ -249,31 +320,46 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             return "";
         }
         List<String> clauses = new ArrayList<>();
+
+        // Pre-compile once outside the loop if you like:
+        Pattern pNum = Pattern.compile("^attributecriteria\\[(\\d+)\\]\\.valuenumeric$");
+        Pattern pStr = Pattern.compile("^attributecriteria\\[(\\d+)\\]\\.valuestring$");
+
         for (Sort.Order o : sort) {
-//            String expr;
-            String path = switch (o.getProperty().toLowerCase(Locale.ROOT)) {
+            String prop = o.getProperty().toLowerCase(Locale.ROOT);
+
+            // 1) First, handle attributeCriteria[*].valueNumeric / .valueString
+            Matcher mNum = pNum.matcher(prop);
+            Matcher mStr = pStr.matcher(prop);
+            if (mNum.matches() || mStr.matches()) {
+                int idx = Integer.parseInt(mNum.matches() ? mNum.group(1) : mStr.group(1));
+                String expr = mNum.matches()
+                        ? "avSort" + idx + ".valueNumeric"
+                        : "avSort" + idx + ".valueString";
+                clauses.add(expr + " " + o.getDirection());
+                continue;  // skip the static switch below
+            }
+
+            // 2) Otherwise, fall back to your existing cases:
+            String path = switch (prop) {
                 case "valuenumeric", "attributevaluenumeric" -> idQuery ? "avSort.valueNumeric" : "av.valueNumeric";
-                case "productattributes.attributevalue.attribute.name" ->
-                        idQuery ? "paSort.attributeValue.attribute.name"
-                                : "a.name";
                 case "valuestring", "attributevaluestring" -> idQuery ? "avSort.valueString" : "av.valueString";
+                case "productattributes.attributevalue.attribute.name" -> idQuery
+                        ? "paSort.attributeValue.attribute.name"
+                        : "a.name";
                 case "name" -> "p.name";
                 case "baseprice" -> "p.basePrice";
                 case "brand.name", "brand", "brandname" -> "b.name";
                 case "manufacturer.name", "manufacturername", "manufacturer" -> "m.name";
-//                case "price" -> {
-//                    // put nulls last when descending, or first when ascending, for example:
-//                    boolean descending = o.isDescending();
-//                    expr = "cph.price "
-//                            + (descending ? " NULLS LAST" : " NULLS FIRST");
-//                }
                 case "currentpricehistory.price", "currentprice", "price" -> "cph.price";
                 default -> throw new IllegalArgumentException("Unknown sort: " + o.getProperty());
             };
             clauses.add(path + " " + o.getDirection());
         }
+
         return " ORDER BY " + String.join(", ", clauses);
     }
+
 
     // Builder classes unchanged…
     private static class ProductDtoBuilder {

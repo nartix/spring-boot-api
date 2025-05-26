@@ -1,6 +1,7 @@
 package com.ferozfaiz.product.product;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -87,5 +88,29 @@ public class ProductFilter {
 
     public void setAttributeValueString(List<String> attributeValueString) {
         this.attributeValueString = attributeValueString;
+    }
+
+    // New: a list of attribute filters
+    private List<AttributeCriteria> attributeCriteria = new ArrayList<>();
+    public List<AttributeCriteria> getAttributeCriteria() {
+        return attributeCriteria;
+    }
+    public void setAttributeCriteria(List<AttributeCriteria> attributeCriteria) {
+        this.attributeCriteria = attributeCriteria;
+    }
+
+
+    public static class AttributeCriteria {
+        private String name;
+        private List<String> valueStrings;
+        private List<BigDecimal> valueNumerics;
+
+        // getters & setters
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public List<String> getValueStrings() { return valueStrings; }
+        public void setValueStrings(List<String> valueStrings) { this.valueStrings = valueStrings; }
+        public List<BigDecimal> getValueNumerics() { return valueNumerics; }
+        public void setValueNumerics(List<BigDecimal> valueNumerics) { this.valueNumerics = valueNumerics; }
     }
 }

@@ -2,7 +2,6 @@ package com.ferozfaiz.product.attributevalue;
 
 import com.ferozfaiz.product.attribute.ProductAttribute;
 import com.ferozfaiz.product.measurementunit.ProductMeasurementUnit;
-import com.ferozfaiz.product.product.Product;
 import jakarta.persistence.*;
 import org.springframework.data.rest.core.annotation.RestResource;
 
@@ -14,7 +13,9 @@ import org.springframework.data.rest.core.annotation.RestResource;
 @Table(
         name = "product_attributevalue",
         indexes = {
-                @Index(name = "product_attributevalue_attribute_idx", columnList = "attribute_id")
+                @Index(name = "product_attributevalue_attribute_idx", columnList = "attribute_id"),
+                @Index(name = "product_attributevalue_attribute_id_value_string_idx", columnList = "attribute_id,value_string"),
+                @Index(name = "product_attributevalue_attribute_id_value_numeric_idx", columnList = "attribute_id,value_numeric")
         }
 )
 //@RepositoryRestResource( exported = false )
