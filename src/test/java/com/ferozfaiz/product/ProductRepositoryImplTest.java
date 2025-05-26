@@ -572,6 +572,72 @@ class ProductRepositoryImplTest {
                 });
     }
 
+    // path /products?attributeName=Width&attributeValueNumeric=5&attributeValueNumeric=10&sort=attributeValueNumeric,asc
+    @Test
+    @Order(73)
+    @DisplayName("7.3 When filtering by Width = 5 and 10, returns only products with those widths, sorted ascending")
+    void whenAttributeNumericFilterAndSortAsc_thenCorrectOrder() {
+        var filter = new ProductFilter();
+        filter.setAttributeName("Width");
+        filter.setAttributeValueNumeric(List.of(
+                BigDecimal.valueOf(5),
+                BigDecimal.valueOf(10)
+        ));
+        Pageable page = PageRequest.of(0, 10, Sort.by("attributeValueNumeric").ascending());
+        List<ProductDto> dtos = repo.findAllByFilter(filter, page).getContent();
+
+        // pull out the Width numbers
+        List<Double> nums = dtos.stream()
+                .map(dto -> dto.attributes().stream()
+                        .filter(a -> "Width".equals(a.attributeName()))
+                        .findFirst().get()               // now guaranteed present
+                        .attributeValueNumeric()
+                )
+                .toList();
+
+        // build a sorted‐ascending copy at runtime
+        List<Double> sortedAsc = new ArrayList<>(nums);
+        sortedAsc.sort(Comparator.naturalOrder());
+
+        // and assert they came back already in that same order
+        assertThat(nums)
+                .withFailMessage("Expected %s to already be in ascending order", nums)
+                .isEqualTo(sortedAsc);
+    }
+
+    // path /products?attributeName=Width&attributeValueNumeric=5&attributeValueNumeric=10&sort=attributeValueNumeric,desc
+    @Test
+    @Order(74)
+    @DisplayName("7.4 When filtering by Width = 5 and 10, returns only products with those widths, sorted descending")
+    void whenAttributeNumericFilterAndSortDesc_thenCorrectOrder() {
+        var filter = new ProductFilter();
+        filter.setAttributeName("Width");
+        filter.setAttributeValueNumeric(List.of(
+                BigDecimal.valueOf(5),
+                BigDecimal.valueOf(10)
+        ));
+        Pageable page = PageRequest.of(0, 10, Sort.by("attributeValueNumeric").descending());
+        List<ProductDto> dtos = repo.findAllByFilter(filter, page).getContent();
+
+        // pull out the Width numbers
+        List<Double> nums = dtos.stream()
+                .map(dto -> dto.attributes().stream()
+                        .filter(a -> "Width".equals(a.attributeName()))
+                        .findFirst().get()               // now guaranteed present
+                        .attributeValueNumeric()
+                )
+                .toList();
+
+        // build a sorted‐descending copy at runtime
+        List<Double> sortedDesc = new ArrayList<>(nums);
+        sortedDesc.sort(Comparator.reverseOrder());
+
+        // and assert they came back already in that same order
+        assertThat(nums)
+                .withFailMessage("Expected %s to already be in descending order", nums)
+                .isEqualTo(sortedDesc);
+    }
+
     // path /products?attributeName=Size&attributeValueString=M&attributeValueNumeric=2
     @Test
     @Order(81)
