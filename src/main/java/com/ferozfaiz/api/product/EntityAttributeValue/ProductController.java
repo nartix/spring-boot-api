@@ -4,6 +4,7 @@ import com.ferozfaiz.product.product.ProductDto;
 import com.ferozfaiz.product.product.ProductFilter;
 import com.ferozfaiz.product.product.ProductRepository;
 import com.ferozfaiz.product.product.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -31,7 +32,7 @@ public class ProductController {
 
     @GetMapping
     public Page<ProductDto> list(
-            ProductFilter filter,
+            @Valid ProductFilter filter,
             @PageableDefault(size = 20) Pageable page
     ) {
         return svc.findAll(filter, page);
