@@ -169,6 +169,7 @@ class ProductRepositoryImplTest {
         em.flush();
         em.clear();
     }
+
     // path: /products
     @Test
     @Order(11)
@@ -263,6 +264,7 @@ class ProductRepositoryImplTest {
         assertThat(result.getContent().get(0).name()).isEqualTo("Widget");
     }
 
+    // path /products?brandName=Acme
     @Test
     @Order(41)
     @DisplayName("4.1 When filtering by brand 'Acme', returns only products with that brand")
@@ -277,6 +279,7 @@ class ProductRepositoryImplTest {
         );
     }
 
+    // path /products?brandName=Acme&name=wid
     @Test
     @Order(42)
     @DisplayName("4.2 When filtering by brand 'Acme' and name 'wid', returns only matching product")
@@ -291,6 +294,7 @@ class ProductRepositoryImplTest {
         assertThat(page.getContent().get(0).brand()).isEqualTo("Acme");
     }
 
+    // path /products?brandName=Acme,Global
     @Test
     @Order(43)
     @DisplayName("4.3 When filtering by brand 'Acme' and 'Global', returns only matching products")
@@ -305,7 +309,7 @@ class ProductRepositoryImplTest {
         );
     }
 
-
+    // path /products?sort=brand,asc
     @Test
     @Order(51)
     @DisplayName("5.1 Sort by brand ascending returns correct order (nulls first)")
@@ -328,6 +332,7 @@ class ProductRepositoryImplTest {
                 .isEqualTo(sorted);
     }
 
+    // path /products?sort=brand,desc
     @Test
     @Order(52)
     @DisplayName("5.2 Sort by brand descending returns correct order (nulls last)")
@@ -392,6 +397,7 @@ class ProductRepositoryImplTest {
                 .isEqualTo(sortedDesc);
     }
 
+    // path /products?manufacturerName=M1
     @Test
     @Order(151)
     @DisplayName("15.1 When filtering by manufacturer 'M1', returns only products with that manufacturer")
@@ -406,6 +412,7 @@ class ProductRepositoryImplTest {
         );
     }
 
+    // path /products?manufacturerName=M2&name=doo
     @Test
     @Order(152)
     @DisplayName("15.2 When filtering by manufacturer 'M2' and name 'doo', returns only matching product")
@@ -420,6 +427,8 @@ class ProductRepositoryImplTest {
         assertThat(page.getContent().get(0).manufacturer()).isEqualTo("M2");
     }
 
+
+    // path /products?manufacturerName=M1,M2
     @Test
     @Order(153)
     @DisplayName("15.3 When filtering by manufacturers 'M1' and 'M2', returns only matching products")
@@ -434,6 +443,7 @@ class ProductRepositoryImplTest {
         );
     }
 
+    // path /products?sort=manufacturerName,asc
     @Test
     @Order(154)
     @DisplayName("15.4 Sort by manufacturer ascending returns correct order (nulls first)")
@@ -454,6 +464,7 @@ class ProductRepositoryImplTest {
                 .isEqualTo(expected);
     }
 
+    // path /products?sort=manufacturer,desc
     @Test
     @Order(155)
     @DisplayName("15.5 Sort by manufacturer descending returns correct order (nulls last)")
@@ -474,6 +485,7 @@ class ProductRepositoryImplTest {
                 .isEqualTo(expected);
     }
 
+    // path /products?manufacturerName=M1,M2&sort=manufacturerName,asc
     @Test
     @Order(156)
     @DisplayName("15.6 Filter by 'M1','M2' and sort by manufacturer ascending returns correct order")
@@ -495,6 +507,7 @@ class ProductRepositoryImplTest {
                 .isEqualTo(expected);
     }
 
+    // path /products?manufacturerName=M1,M2&sort=manufacturer,desc
     @Test
     @Order(157)
     @DisplayName("15.7 Filter by 'M1','M2' and sort by manufacturer descending returns correct order")
@@ -516,29 +529,17 @@ class ProductRepositoryImplTest {
                 .isEqualTo(expected);
     }
 
-
-
-//    @Test
-//    @DisplayName("3.3 Between min & max price")
-//    void whenPriceRange_thenCorrectProducts() {
-//        var filter = new ProductFilter();
-//        filter.setMinBasePrice(BigDecimal.valueOf(5.0));
-//        filter.setMaxBasePrice(BigDecimal.valueOf(15.0));
-//        Page<ProductDto> page = repo.findAllByFilter(filter, PageRequest.of(0, 10));
-//
-//        // e.g. products priced 10 and 12 match
-//        assertThat(page.getContent()).extracting("basePrice")
-//                .allMatch(p -> p >= 5.0 && p <= 15.0);
-//    }
-
-    // path /products?attributeName=Color&attributeValueString=Red
+    // path /products?attributeCriteria[0].name=Color&attributeCriteria[0].valueString=Red
     @Test
-    @Order(61)
-    @DisplayName("6.1 When filtering by Color='Red', returns only the two red products")
+    @Order(71)
+    @DisplayName("7.1 When filtering by Color='Red', returns only the two red products (using attributeCriteria)")
     void whenAttributeStringFilter_thenCorrectProducts() {
         var filter = new ProductFilter();
-        filter.setAttributeName("Color");
-        filter.setAttributeValueString(List.of("Red"));
+        var crit = new ProductFilter.AttributeCriteria();
+        crit.setName("Color");
+        crit.setValueStrings(List.of("Red"));
+        filter.setAttributeCriteria(List.of(crit));
+
         Page<ProductDto> page = repo.findAllByFilter(filter, PageRequest.of(0, 10));
 
         assertThat(page.getTotalElements()).isEqualTo(2); // two products are red
@@ -549,17 +550,17 @@ class ProductRepositoryImplTest {
         );
     }
 
-    // path /products?attributeName=Width&attributeValueNumeric=5&attributeValueNumeric=10
+    // path /products?attributeCriteria[0].name=Width&attributeCriteria[0].valueNumeric=5,10
     @Test
     @Order(72)
-    @DisplayName("7.2 When filtering by Width = 5 and 10, returns only products with those widths")
+    @DisplayName("7.2 When filtering by Width = 5 and 10, returns only products with those widths (using attributeCriteria)")
     void whenAttributeNumericFilter_thenCorrectProducts() {
         var filter = new ProductFilter();
-        filter.setAttributeName("Width");
-        filter.setAttributeValueNumeric(List.of(
-                BigDecimal.valueOf(5),
-                BigDecimal.valueOf(10)
-        ));
+        var crit = new ProductFilter.AttributeCriteria();
+        crit.setName("Width");
+        crit.setValueNumerics(List.of(BigDecimal.valueOf(5), BigDecimal.valueOf(10)));
+        filter.setAttributeCriteria(List.of(crit));
+
         Page<ProductDto> page = repo.findAllByFilter(filter, PageRequest.of(0, 10));
 
         assertThat(page.getContent())
@@ -569,177 +570,170 @@ class ProductRepositoryImplTest {
                             .map(AttributeDto::attributeValueNumeric)
                             .toList();
                     assertThat(widths).anyMatch(n -> n == 5.0 || n == 10.0);
+                    assertThat(widths).isNotEmpty();
                 });
     }
 
-    // path /products?attributeName=Width&attributeValueNumeric=5&attributeValueNumeric=10&sort=attributeValueNumeric,asc
+    // path /products?attributeCriteria[0].name=Width&attributeCriteria[0].valueNumeric=5,10&sort=attributeCriteria[0].valueNumeric,asc
     @Test
     @Order(73)
-    @DisplayName("7.3 When filtering by Width = 5 and 10, returns only products with those widths, sorted ascending")
+    @DisplayName("7.3 When filtering by Width = 5 and 10, sorted ascending (using attributeCriteria)")
     void whenAttributeNumericFilterAndSortAsc_thenCorrectOrder() {
         var filter = new ProductFilter();
-        filter.setAttributeName("Width");
-        filter.setAttributeValueNumeric(List.of(
-                BigDecimal.valueOf(5),
-                BigDecimal.valueOf(10)
-        ));
-        Pageable page = PageRequest.of(0, 10, Sort.by("attributeValueNumeric").ascending());
+        var crit = new ProductFilter.AttributeCriteria();
+        crit.setName("Width");
+        crit.setValueNumerics(List.of(BigDecimal.valueOf(5), BigDecimal.valueOf(10)));
+        filter.setAttributeCriteria(List.of(crit));
+
+        Pageable page = PageRequest.of(0, 10, Sort.by("attributeCriteria[0].valueNumeric").ascending());
         List<ProductDto> dtos = repo.findAllByFilter(filter, page).getContent();
 
-        // pull out the Width numbers
         List<Double> nums = dtos.stream()
                 .map(dto -> dto.attributes().stream()
                         .filter(a -> "Width".equals(a.attributeName()))
-                        .findFirst().get()               // now guaranteed present
+                        .findFirst().get()
                         .attributeValueNumeric()
                 )
                 .toList();
 
-        // build a sorted‐ascending copy at runtime
         List<Double> sortedAsc = new ArrayList<>(nums);
         sortedAsc.sort(Comparator.naturalOrder());
 
-        // and assert they came back already in that same order
         assertThat(nums)
                 .withFailMessage("Expected %s to already be in ascending order", nums)
                 .isEqualTo(sortedAsc);
     }
 
-    // path /products?attributeName=Width&attributeValueNumeric=5&attributeValueNumeric=10&sort=attributeValueNumeric,desc
+    // path /products?attributeCriteria[0].name=Width&attributeCriteria[0].valueNumeric=5,10&sort=attributeCriteria[0].valueNumeric,desc
     @Test
     @Order(74)
-    @DisplayName("7.4 When filtering by Width = 5 and 10, returns only products with those widths, sorted descending")
+    @DisplayName("7.4 When filtering by Width = 5 and 10, sorted descending (using attributeCriteria)")
     void whenAttributeNumericFilterAndSortDesc_thenCorrectOrder() {
         var filter = new ProductFilter();
-        filter.setAttributeName("Width");
-        filter.setAttributeValueNumeric(List.of(
-                BigDecimal.valueOf(5),
-                BigDecimal.valueOf(10)
-        ));
-        Pageable page = PageRequest.of(0, 10, Sort.by("attributeValueNumeric").descending());
+        var crit = new ProductFilter.AttributeCriteria();
+        crit.setName("Width");
+        crit.setValueNumerics(List.of(BigDecimal.valueOf(5), BigDecimal.valueOf(10)));
+        filter.setAttributeCriteria(List.of(crit));
+
+        Pageable page = PageRequest.of(0, 10, Sort.by("attributeCriteria[0].valueNumeric").descending());
         List<ProductDto> dtos = repo.findAllByFilter(filter, page).getContent();
 
-        // pull out the Width numbers
         List<Double> nums = dtos.stream()
                 .map(dto -> dto.attributes().stream()
                         .filter(a -> "Width".equals(a.attributeName()))
-                        .findFirst().get()               // now guaranteed present
+                        .findFirst().get()
                         .attributeValueNumeric()
                 )
                 .toList();
 
-        // build a sorted‐descending copy at runtime
         List<Double> sortedDesc = new ArrayList<>(nums);
         sortedDesc.sort(Comparator.reverseOrder());
 
-        // and assert they came back already in that same order
         assertThat(nums)
                 .withFailMessage("Expected %s to already be in descending order", nums)
                 .isEqualTo(sortedDesc);
     }
 
-    // path /products?attributeName=Size&attributeValueString=M&attributeValueNumeric=2
+    // path /products?attributeCriteria[0].name=Size&attributeCriteria[0].valueString=M&attributeCriteria[0].valueNumeric=2
     @Test
     @Order(81)
-    @DisplayName("8.1 When filtering Size='M' and numeric Size=2, returns exactly one matching product")
+    @DisplayName("8.1 When filtering Size='M' and numeric Size=2, returns exactly one matching product (using attributeCriteria)")
     void whenCombinedAttrFilters_thenIntersectedResults() {
         var filter = new ProductFilter();
-        filter.setAttributeName("Size");
-        filter.setAttributeValueString(List.of("M"));
-        filter.setAttributeValueNumeric(List.of(BigDecimal.valueOf(2)));
+        var crit = new ProductFilter.AttributeCriteria();
+        crit.setName("Size");
+        crit.setValueStrings(List.of("M"));
+        crit.setValueNumerics(List.of(BigDecimal.valueOf(2)));
+        filter.setAttributeCriteria(List.of(crit));
+
         Page<ProductDto> page = repo.findAllByFilter(filter, PageRequest.of(0, 10));
 
         assertThat(page.getTotalElements()).isEqualTo(1);
 
         var attrs = page.getContent().get(0).attributes();
 
-        // string match
         assertThat(attrs)
                 .extracting(AttributeDto::attributeName, AttributeDto::attributeValueString)
                 .contains(tuple("Size", "M"));
 
-        // numeric match
         assertThat(attrs)
                 .extracting(AttributeDto::attributeName, AttributeDto::attributeValueNumeric)
                 .contains(tuple("Size", 2.0));
     }
 
-    // path /products?attributeName=Width&attributeValueNumeric=5&attributeValueNumeric=10&sort=valueNumeric,desc
+    // path /products?attributeCriteria[0].name=Width&attributeCriteria[0].valueNumeric=5,10&sort=attributeCriteria[0].valueNumeric,desc
     @Test
     @Order(91)
-    @DisplayName("9.1 Sort by valueNumeric desc, for AttributeName=Width")
+    @DisplayName("9.1 Sort by attributeCriteria[0].valueNumeric desc, for AttributeName=Width")
     void whenSortByNumericDesc_thenCorrectOrder() {
         var filter = new ProductFilter();
-        filter.setAttributeName("Width");
-        // only those products whose Width is 10.0 or 5.0
-        filter.setAttributeValueNumeric(List.of(BigDecimal.valueOf(10.0), BigDecimal.valueOf(5.0)));
+        var crit = new ProductFilter.AttributeCriteria();
+        crit.setName("Width");
+        crit.setValueNumerics(List.of(BigDecimal.valueOf(10.0), BigDecimal.valueOf(5.0)));
+        filter.setAttributeCriteria(List.of(crit));
 
-        Pageable page = PageRequest.of(0, 10, Sort.by("valueNumeric").descending());
+        Pageable page = PageRequest.of(0, 10, Sort.by("attributeCriteria[0].valueNumeric").descending());
         List<ProductDto> dtos = repo.findAllByFilter(filter, page).getContent();
 
-        // pull out the Width numbers
         List<Double> nums = dtos.stream()
                 .map(dto -> dto.attributes().stream()
                         .filter(a -> "Width".equals(a.attributeName()))
-                        .findFirst().get()               // now guaranteed present
+                        .findFirst().get()
                         .attributeValueNumeric()
                 )
                 .toList();
 
-        // build a sorted‐descending copy at runtime
         List<Double> sortedDesc = new ArrayList<>(nums);
         sortedDesc.sort(Comparator.reverseOrder());
 
-        // and assert they came back already in that same order
         assertThat(nums)
                 .withFailMessage("Expected %s to already be in descending order", nums)
                 .isEqualTo(sortedDesc);
     }
 
-    // path /products?attributeName=Width&attributeValueNumeric=5&attributeValueNumeric=10&sort=valueNumeric,asc
+    // path /products?attributeCriteria[0].name=Width&attributeCriteria[0].valueNumeric=5,10&sort=attributeCriteria[0].valueNumeric,asc
     @Test
     @Order(92)
-    @DisplayName("9.2 Sort by valueNumeric asc, for AttributeName=Width")
+    @DisplayName("9.2 Sort by attributeCriteria[0].valueNumeric asc, for AttributeName=Width")
     void whenSortByNumericAsc_thenCorrectOrder() {
         var filter = new ProductFilter();
-        filter.setAttributeName("Width");
-        // only products with Width = 10.0 or 5.0
-        filter.setAttributeValueNumeric(List.of(BigDecimal.valueOf(10.0), BigDecimal.valueOf(5.0)));
+        var crit = new ProductFilter.AttributeCriteria();
+        crit.setName("Width");
+        crit.setValueNumerics(List.of(BigDecimal.valueOf(10.0), BigDecimal.valueOf(5.0)));
+        filter.setAttributeCriteria(List.of(crit));
 
-        Pageable page = PageRequest.of(0, 10, Sort.by("valueNumeric").ascending());
+        Pageable page = PageRequest.of(0, 10, Sort.by("attributeCriteria[0].valueNumeric").ascending());
         List<ProductDto> dtos = repo.findAllByFilter(filter, page).getContent();
 
-        // extract each DTO’s Width numeric
         List<Double> nums = dtos.stream()
                 .map(dto -> dto.attributes().stream()
                         .filter(a -> "Width".equals(a.attributeName()))
-                        .findFirst().get()                     // now guaranteed present
+                        .findFirst().get()
                         .attributeValueNumeric()
                 )
                 .toList();
 
-        // build an ascending‐sorted copy
         List<Double> sortedAsc = new ArrayList<>(nums);
         sortedAsc.sort(Comparator.naturalOrder());
 
-        // assert the returned order already matches
         assertThat(nums)
                 .withFailMessage("Expected %s to already be in ascending order", nums)
                 .isEqualTo(sortedAsc);
     }
 
-    // path /products?attributeName=Width&sort=valueNumeric,desc,name,asc
+    // path /products?attributeCriteria[0].name=Width&sort=attributeCriteria[0].valueNumeric,desc,name,asc
     @Test
     @Order(93)
-    @DisplayName("9.3 Sort by valueNumeric desc, for AttributeName=Width and sort by name, first result is Gadget, first product have no attribute width")
+    @DisplayName("9.3 Sort by attributeCriteria[0].valueNumeric desc, for Width, then by name asc; first result is Gadget")
     void whenSortByNameAndNumericDesc_thenCorrectOrder() {
         var filter = new ProductFilter();
-        filter.setAttributeName("Width");
+        var crit = new ProductFilter.AttributeCriteria();
+        crit.setName("Width");
+        filter.setAttributeCriteria(List.of(crit));
 
-        Pageable page = PageRequest.of(0, 10, Sort.by("valueNumeric").descending().and(Sort.by("name").ascending()));
+        Pageable page = PageRequest.of(0, 10, Sort.by("attributeCriteria[0].valueNumeric").descending().and(Sort.by("name").ascending()));
         List<ProductDto> dtos = repo.findAllByFilter(filter, page).getContent();
 
-        // check for name == Gadget
         assertThat(dtos.get(0).name()).isEqualTo("Gadget");
     }
 
@@ -769,6 +763,7 @@ class ProductRepositoryImplTest {
                 .withFailMessage("Expected last price to be null but was %s", prices.get(prices.size() - 1))
                 .isNull();
     }
+
 
     // path /products?sort=price,asc
     @Test
