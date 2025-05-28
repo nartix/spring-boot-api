@@ -60,18 +60,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             where.append(" AND LOWER(p.name) LIKE LOWER(CONCAT('%',:name,'%'))");
             params.put("name", filter.getName());
         }
-        if (filter.getMinBasePrice() != null) {
-            where.append(" AND p.basePrice >= :minBasePrice");
-            params.put("minBasePrice", filter.getMinBasePrice());
-        }
-        if (filter.getMaxBasePrice() != null) {
-            where.append(" AND p.basePrice <= :maxBasePrice");
-            params.put("maxBasePrice", filter.getMaxBasePrice());
-        }
-        if (filter.getActive() != null) {
-            where.append(" AND p.isActive = :active");
-            params.put("active", filter.getActive());
-        }
+
         if (filter.getBrandName() != null && !filter.getBrandName().isEmpty()) {
             List<String> lowered = filter.getBrandName().stream()
                     .map(String::toLowerCase)
@@ -98,50 +87,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 //                + " JOIN paF.attributeValue avF";
         // 2a) filter by attribute-valueStrings (e.g. Speed = {DDR4, DDR5})
 // … inside findAllByFilter, after you’ve built `baseJoins`, `where`, and `params` …
-
-        // Only fire this once if you have at least one of the two filters:
-        if (filter.getAttributeName() != null &&
-                (
-                        (filter.getAttributeValueString() != null
-                                && !filter.getAttributeValueString().isEmpty())
-                                || (filter.getAttributeValueNumeric() != null
-                                && !filter.getAttributeValueNumeric().isEmpty())
-                )
-        ) {
-            // bind the attribute name
-            params.put("attributeName", filter.getAttributeName());
-
-            // start a single EXISTS subquery
-            where.append("""
-                      AND EXISTS (
-                        SELECT pa
-                          FROM p.productAttributes pa
-                          JOIN pa.attributeValue av
-                         WHERE LOWER(pa.attributeValue.attribute.name) = LOWER(:attributeName)
-                    """);
-
-            // string‐match portion (if any)
-            if (filter.getAttributeValueString() != null
-                    && !filter.getAttributeValueString().isEmpty()) {
-
-                List<String> lowered = filter.getAttributeValueString().stream()
-                        .map(String::toLowerCase)
-                        .toList();
-                where.append("   AND LOWER(av.valueString) IN :valueStrings\n");
-                params.put("valueStrings", lowered);
-            }
-
-            // numeric‐match portion (if any)
-            if (filter.getAttributeValueNumeric() != null
-                    && !filter.getAttributeValueNumeric().isEmpty()) {
-
-                where.append("   AND av.valueNumeric    IN :valueNumerics\n");
-                params.put("valueNumerics", filter.getAttributeValueNumeric());
-            }
-
-            // close the EXISTS
-            where.append(")\n");
-        }
 
 
         List<ProductFilter.AttributeCriteria> crits = filter.getAttributeCriteria();

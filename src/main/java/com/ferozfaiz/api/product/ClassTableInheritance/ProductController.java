@@ -1,4 +1,4 @@
-package com.ferozfaiz.api.product.controller;
+package com.ferozfaiz.api.product.ClassTableInheritance;
 
 /**
  * @author Feroz Faiz

@@ -1,5 +1,9 @@
 package com.ferozfaiz.product.product;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,33 +12,19 @@ import java.util.List;
  * @author Feroz Faiz
  */
 public class ProductFilter {
+    // validate name
+    @Size(max = 255)
     private String name;
-    private BigDecimal minBasePrice;
-    private BigDecimal maxBasePrice;
-    private Boolean active;
-    private List<String> brandName;
-    private List<String> manufacturerName;
-    private String attributeName;
-    private List<BigDecimal> attributeValueNumeric;
-    private List<String> attributeValueString;
 
-    public List<BigDecimal> getAttributeValueNumeric() {
-        return attributeValueNumeric;
-    }
+    @Size(max = 5)
+    private List<@Size(max = 50) String> brandName;
 
-    public void setAttributeValueNumeric(List<BigDecimal> attributeValueNumeric) {
-        this.attributeValueNumeric = attributeValueNumeric;
-    }
+    @Size(max = 5)
+    private List<@Size(max = 50) String> manufacturerName;
 
-    public String getAttributeName() {
-        return attributeName;
-    }
 
-    public void setAttributeName(String attributeName) {
-        this.attributeName = attributeName;
-    }
-
-    public List<String> getManufacturerName() {
+    @Size(max = 5)
+    public List<@Size(max = 50) String> getManufacturerName() {
         return manufacturerName;
     }
 
@@ -50,30 +40,6 @@ public class ProductFilter {
         this.brandName = brandName;
     }
 
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public BigDecimal getMaxBasePrice() {
-        return maxBasePrice;
-    }
-
-    public void setMaxBasePrice(BigDecimal maxBasePrice) {
-        this.maxBasePrice = maxBasePrice;
-    }
-
-    public BigDecimal getMinBasePrice() {
-        return minBasePrice;
-    }
-
-    public void setMinBasePrice(BigDecimal minBasePrice) {
-        this.minBasePrice = minBasePrice;
-    }
-
     public String getName() {
         return name;
     }
@@ -82,15 +48,6 @@ public class ProductFilter {
         this.name = name;
     }
 
-    public List<String> getAttributeValueString() {
-        return attributeValueString;
-    }
-
-    public void setAttributeValueString(List<String> attributeValueString) {
-        this.attributeValueString = attributeValueString;
-    }
-
-    // New: a list of attribute filters
     private List<AttributeCriteria> attributeCriteria = new ArrayList<>();
     public List<AttributeCriteria> getAttributeCriteria() {
         return attributeCriteria;
@@ -99,11 +56,16 @@ public class ProductFilter {
         this.attributeCriteria = attributeCriteria;
     }
 
-
     public static class AttributeCriteria {
+        @NotNull
+        @Size(max = 255)
         private String name;
-        private List<String> valueStrings;
-        private List<BigDecimal> valueNumerics;
+
+        @Size(max = 5)
+        private List<@Size(max = 100) String> valueStrings;
+
+        @Size(max = 5)
+        private List<@DecimalMin(value = "0.0", inclusive = true) BigDecimal> valueNumerics;
 
         // getters & setters
         public String getName() { return name; }
