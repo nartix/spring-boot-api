@@ -28,3 +28,10 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# in dev only
+server:
+  tomcat:
+    relaxedQueryChars:
+      - '['
+      - ']'

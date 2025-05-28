@@ -389,6 +389,13 @@
         </createIndex>
     </changeSet>
 
+    <changeSet author="Feroz" id="idx_product_attribute_name_lower_idx">
+        <sql>
+            CREATE INDEX product_attribute_name_lower_idx
+            ON product_attribute (lower(name));
+        </sql>
+    </changeSet>
+
     <changeSet id="create_product_attributevalue_table" author="Feroz">
         <createTable tableName="product_attributevalue">
             <column name="id" type="INT" autoIncrement="true">
@@ -419,6 +426,27 @@
                 referencedTableName="product_measurementunit"
                 referencedColumnNames="id"
                 onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet author="Feroz" id="idx_product_attributevalue_attribute_id_value_string_idx">
+        <createIndex indexName="product_attributevalue_attribute_id_value_string_idx" tableName="product_attributevalue">
+            <column name="attribute_id"/>
+            <column name="value_string"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="Feroz" id="idx_product_attributevalue_attribute_id_value_numeric_idx">
+        <createIndex indexName="product_attributevalue_attribute_id_value_numeric_idx" tableName="product_attributevalue">
+            <column name="attribute_id"/>
+            <column name="value_numeric"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="Feroz" id="idx_product_attributevalue_value_string_lower_idx">
+        <sql>
+            CREATE INDEX product_attributevalue_value_string_lower_idx
+            ON product_attributevalue (lower(value_string));
+        </sql>
     </changeSet>
 
     <!-- Moved 'product_product' creation BEFORE referencing changesets -->
@@ -680,6 +708,70 @@
             <column name="name"/>
         </createIndex>
     </changeSet>
+
+    <changeSet id="create_cti_product_table" author="Feroz">
+        <createTable tableName="cti_product">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="product_type_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="base_price" type="DECIMAL(10,2)" defaultValueNumeric="0.00">
+                <constraints nullable="false"/>
+            </column>
+            <column name="view_count" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slug" type="VARCHAR(255)"/>
+            <column name="brand_id" type="BIGINT"/>
+            <column name="manufacturer_id" type="BIGINT"/>
+        </createTable>
+        <createIndex indexName="cti_product_name_idx" tableName="cti_product">
+            <column name="name"/>
+        </createIndex>
+        <createIndex indexName="cti_product_slug_idx" tableName="cti_product">
+            <column name="slug"/>
+        </createIndex>
+        <createIndex indexName="cti_product_base_price_idx" tableName="cti_product">
+            <column name="base_price"/>
+        </createIndex>
+        <createIndex indexName="cti_product_is_active_idx" tableName="cti_product">
+            <column name="is_active"/>
+        </createIndex>
+        <addForeignKeyConstraint
+                baseTableName="cti_product"
+                baseColumnNames="brand_id"
+                constraintName="fk_cti_product_brand"
+                referencedTableName="cti_brand"
+                referencedColumnNames="id"
+                onDelete="SET NULL"/>
+        <addForeignKeyConstraint
+                baseTableName="cti_product"
+                baseColumnNames="manufacturer_id"
+                constraintName="fk_cti_product_manufacturer"
+                referencedTableName="cti_manufacturer"
+                referencedColumnNames="id"
+                onDelete="SET NULL"/>
+        <addForeignKeyConstraint
+                baseTableName="cti_product"
+                baseColumnNames="product_type_id"
+                constraintName="fk_cti_product_product_type"
+                referencedTableName="cti_product_type"
+                referencedColumnNames="id"
+                onDelete="RESTRICT"/>
+    </changeSet>
+
+
     <changeSet id="create_cti_harddrive_table" author="Feroz">
         <createTable tableName="cti_harddrive">
             <column name="product_id" type="BIGINT">
@@ -777,6 +869,8 @@
                 referencedColumnNames="id"
                 onDelete="CASCADE"/>
     </changeSet>
+
+
 
 
 </databaseChangeLog>
