@@ -45,6 +45,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     @Override
     public Page<ProductDto> findAllByFilter(ProductFilter filter, Pageable pageable) {
+
+        // Limit the page size to a maximum of 1000
+        if (pageable.getPageSize() >= 1000 ) {
+            throw new IllegalArgumentException("Page size must be less than 1000");
+        }
+
         // 1) Static joins for brand/manufacturer/price
         String baseJoins = ""
                 + " FROM Product p"
