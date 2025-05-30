@@ -57,7 +57,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 + " LEFT JOIN p.brand b"
                 + " LEFT JOIN p.manufacturer m"
                 + " LEFT JOIN p.currentPriceHistory cph"
-                + "   WITH (cph.isCurrent = true OR cph.endDate IS NULL OR cph.endDate >= CURRENT_TIMESTAMP )";
+                + "   WITH cph.isCurrent = true";
+//                + "   WITH (cph.isCurrent = true OR cph.endDate IS NULL OR cph.endDate >= CURRENT_TIMESTAMP )";
 
         // 2) Dynamic WHERE (note: we no longer filter out products missing the attribute)
         StringBuilder where = new StringBuilder(" WHERE 1=1");
