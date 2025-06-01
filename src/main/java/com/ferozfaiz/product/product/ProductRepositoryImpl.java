@@ -125,6 +125,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         }
 
 
+        // Note: ElasticSearch could be used here fetch the IDs, this way we can have best of both worlds.
         // 3) Total count on all matching products
         String countJpql = "SELECT COUNT(p.id)" + baseJoins + where;
         TypedQuery<Long> countQ = em.createQuery(countJpql, Long.class);
