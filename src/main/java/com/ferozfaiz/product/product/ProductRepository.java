@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,7 +25,7 @@ import java.util.Optional;
  * Tried JpaSpecificationExecutor but it also runs into the same issues.
  * Decided not use QueryDSL as it is not beeing maintained properly.
  */
-//@RepositoryRestResource(collectionResourceRel = "products", path = "products", excerptProjection = ProductProjection.class)
+@RepositoryRestResource(exported = false)
 public interface ProductRepository extends JpaRepository<Product, Integer>, JpaSpecificationExecutor<Product>, ProductRepositoryCustom {
 // public interface ProductRepository extends JpaRepository<Product, Integer>, QuerydslPredicateExecutor<Product>, QuerydslBinderCustomizer<QProduct>, ProductRepositoryCustom, JpaSpecificationExecutor<Product> {
 //public interface ProductRepository extends JpaRepository<Product, Integer>, QuerydslPredicateExecutor<Product>,
