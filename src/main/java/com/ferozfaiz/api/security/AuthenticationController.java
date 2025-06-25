@@ -1,7 +1,8 @@
-package com.ferozfaiz.api.auth.controller;
+package com.ferozfaiz.api.security;
 
 import com.ferozfaiz.common.exception.exception.AuthenticationFailedException;
 import com.ferozfaiz.security.dto.AuthenticationRequestDto;
+import com.ferozfaiz.security.dto.UserRegistrationDto;
 import com.ferozfaiz.security.jwt.dto.TokenResponseDto;
 import com.ferozfaiz.security.jwt.service.JwtService;
 import com.ferozfaiz.security.jwt.util.JwtUtil;
@@ -33,7 +34,7 @@ public class AuthenticationController {
     @Autowired
     private JwtService jwtService;
 
-    @PostMapping("/api/v1/auth/token")
+    @PostMapping("${spring.data.rest.basePath}/auth/token")
     public ResponseEntity<TokenResponseDto> createAuthenticationToken(@Valid @RequestBody AuthenticationRequestDto authenticationRequestDto) throws Exception {
         try {
             // Authenticate the user
@@ -54,8 +55,8 @@ public class AuthenticationController {
     }
 
     @CrossOrigin
-    @PostMapping("/api/v1/auth/login")
-    public ResponseEntity<UserDetails> createAuthenticationToken(@Valid @RequestBody AuthenticationRequestDto authenticationRequestDto, HttpServletRequest request) throws Exception {
+    @PostMapping("${spring.data.rest.basePath}/auth/login")
+    public ResponseEntity<UserDetails> authenticateUser(@Valid @RequestBody AuthenticationRequestDto authenticationRequestDto, HttpServletRequest request) throws Exception {
         try {
             // Authenticate the user
             authenticationManager.authenticate(
@@ -68,17 +69,28 @@ public class AuthenticationController {
         // Load user details and generate token
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequestDto.getUsername());
 
-        final TokenResponseDto tokens = jwtService.generateTokens(userDetails.getUsername());
+//        final TokenResponseDto tokens = jwtService.generateTokens(userDetails.getUsername());
 
         // Create a session and set the user details as an attribute
 //        HttpSession session = request.getSession(true);
 //        session.setAttribute("user", userDetails);
 
-        // Return the token
+        // Return the user details
         return ResponseEntity.ok(userDetails);
     }
 
-    @PostMapping("/api/v1/auth/refresh")
+    @PostMapping("${spring.data.rest.basePath}/auth/register")
+    public ResponseEntity<User> registerUser(@Valid @RequestBody UserRegistrationDto registrationDto) {
+//        User createdUser = userDetailsService.createUser(
+//                registrationDto.getUsername(),
+//                registrationDto.getPassword(),
+//                registrationDto.getEmail()
+//        );
+//        return ResponseEntity.status(201).body(createdUser);
+        return ResponseEntity.status(201).build();
+    }
+
+    @PostMapping("${spring.data.rest.basePath}/auth/refresh")
     public ResponseEntity<?> refreshAccessToken(@RequestBody Map<String, String> requestBody) {
         String refreshToken = requestBody.get("refresh_token");
 
@@ -107,7 +119,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(new TokenResponseDto(newAccessToken, jwtService.getJwtConfig().getTokenValidity(), refreshToken, jwtService.getJwtConfig().getRefreshTokenValidity()));
     }
 
-    @GetMapping("/api/v1/auth/userinfo")
+    @GetMapping("${spring.data.rest.basePath}/auth/userinfo")
     public ResponseEntity<?> getUserInfo(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
 

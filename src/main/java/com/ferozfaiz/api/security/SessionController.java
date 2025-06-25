@@ -1,4 +1,4 @@
-package com.ferozfaiz.api.auth.controller;
+package com.ferozfaiz.api.security;
 
 import com.ferozfaiz.common.util.DateTimeUtil;
 import com.ferozfaiz.security.session.SpringSession;
