@@ -3,6 +3,7 @@ package com.ferozfaiz.api.security;
 import com.ferozfaiz.common.exception.exception.AuthenticationFailedException;
 import com.ferozfaiz.security.dto.AuthenticationRequestDto;
 import com.ferozfaiz.security.dto.UserRegistrationDto;
+import com.ferozfaiz.security.dto.UsernameCheckDto;
 import com.ferozfaiz.security.jwt.dto.TokenResponseDto;
 import com.ferozfaiz.security.jwt.service.JwtService;
 import com.ferozfaiz.security.jwt.util.JwtUtil;
@@ -11,6 +12,7 @@ import com.ferozfaiz.security.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -18,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
@@ -78,6 +81,15 @@ public class AuthenticationController {
 
         // Return the user details
         return ResponseEntity.ok(userDetails);
+    }
+
+    @PostMapping("${spring.data.rest.basePath}/auth/check-username")
+    public ResponseEntity<?> checkUsername(@Valid @RequestBody UsernameCheckDto usernameCheckDto) {
+        boolean exists = userDetailsService.existsByUsernameIgnoreCase(usernameCheckDto.getUsername());
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found");
+        }
+        return ResponseEntity.ok(Map.of("available", false));
     }
 
     @PostMapping("${spring.data.rest.basePath}/auth/register")

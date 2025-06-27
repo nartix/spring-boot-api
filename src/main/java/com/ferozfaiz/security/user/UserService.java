@@ -100,5 +100,9 @@ public class UserService implements UserDetailsService {
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         return userRepository.save(user);
     }
+
+    public boolean existsByUsernameIgnoreCase(String username) {
+        return userRepository.existsByUsernameIgnoreCase(username);
+    }
 }
 

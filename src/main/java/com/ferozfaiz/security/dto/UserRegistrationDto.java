@@ -1,20 +1,16 @@
 package com.ferozfaiz.security.dto;
 
+import com.ferozfaiz.common.annotation.ValidUsername;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 /**
  * @author Feroz Faiz
  */
 public class UserRegistrationDto {
-    @NotBlank
-    @Size(min = 4, max = 20)
-    @Pattern(
-            regexp = "^(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$",
-            message = "{common.validation.constraints.Pattern.ValidUsername.message}"
-    )
+
+    @ValidUsername
     private String username;
 
     @NotBlank(message = "{common.validation.constraints.NotBlank.message}")
