@@ -16,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -80,14 +81,10 @@ public class AuthenticationController {
     }
 
     @PostMapping("${spring.data.rest.basePath}/auth/register")
-    public ResponseEntity<User> registerUser(@Valid @RequestBody UserRegistrationDto registrationDto) {
-//        User createdUser = userDetailsService.createUser(
-//                registrationDto.getUsername(),
-//                registrationDto.getPassword(),
-//                registrationDto.getEmail()
-//        );
-//        return ResponseEntity.status(201).body(createdUser);
-        return ResponseEntity.status(201).build();
+    public ResponseEntity<User> registerUser(@Valid @RequestBody UserRegistrationDto registrationDto) throws MethodArgumentNotValidException, NoSuchMethodException {
+        User createdUser = userDetailsService.createUser(registrationDto);
+        return ResponseEntity.status(201).body(createdUser);
+//        return ResponseEntity.status(201).build();
     }
 
     @PostMapping("${spring.data.rest.basePath}/auth/refresh")
