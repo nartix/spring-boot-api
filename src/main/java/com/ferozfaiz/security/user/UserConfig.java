@@ -6,13 +6,8 @@ import com.ferozfaiz.security.role.RoleRepository;
 import com.ferozfaiz.security.user.roles.UserRoleId;
 import com.ferozfaiz.security.user.roles.UserRoles;
 import com.ferozfaiz.security.user.roles.UserRolesRepository;
-import com.ferozfaiz.security.role.RoleConfig;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -42,9 +37,14 @@ public class UserConfig {
     @Order(2)
     CommandLineRunner commandLineRunner() {
         return args -> {
-            // Check if the user already exists by email or username
-            Optional<User> existingUser = userRepository.findByEmail("feroz@hotmail.ca");
-            if (existingUser.isPresent()) {
+            // Check if the user already exists by username or email
+            Optional<User> existingUserByUsername = userRepository.findByUsernameIgnoreCase("Feroz");
+            if (existingUserByUsername.isPresent()) {
+                System.out.println("User with username 'Feroz' already exists.");
+                return;
+            }
+            Optional<User> existingUserByEmail = userRepository.findByEmailIgnoreCase("feroz@hotmail.ca");
+            if (existingUserByEmail.isPresent()) {
                 System.out.println("User with email 'feroz@hotmail.ca' already exists.");
                 return;
             }
@@ -67,7 +67,7 @@ public class UserConfig {
             // Create and save the user
             User user = new User(
                     null,
-                    "feroz",
+                    "Feroz",
                     encodedPassword,
                     "feroz@hotmail.ca",
                     "Feroz",
