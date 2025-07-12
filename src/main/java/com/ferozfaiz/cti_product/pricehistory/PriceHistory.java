@@ -1,5 +1,6 @@
-package com.ferozfaiz.cti_product.product;
+package com.ferozfaiz.cti_product.pricehistory;
 
+import com.ferozfaiz.cti_product.product.Product;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;

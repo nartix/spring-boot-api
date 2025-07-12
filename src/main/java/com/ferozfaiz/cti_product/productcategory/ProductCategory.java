@@ -1,6 +1,7 @@
-package com.ferozfaiz.cti_product.product;
+package com.ferozfaiz.cti_product.productcategory;
 
 import com.ferozfaiz.cti_product.category.Category;
+import com.ferozfaiz.cti_product.product.Product;
 import jakarta.persistence.*;
 
 @Entity

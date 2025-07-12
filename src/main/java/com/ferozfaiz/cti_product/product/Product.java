@@ -3,6 +3,7 @@ package com.ferozfaiz.cti_product.product;
 import com.ferozfaiz.cti_product.brand.Brand;
 import com.ferozfaiz.cti_product.category.Category;
 import com.ferozfaiz.cti_product.manufacturer.Manufacturer;
+import com.ferozfaiz.cti_product.pricehistory.PriceHistory;
 import com.ferozfaiz.cti_product.producttype.ProductType;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
