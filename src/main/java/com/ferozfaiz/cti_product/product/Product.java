@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -50,7 +51,7 @@ public class Product {
     @Column(length = 255)
     private String slug;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "cti_productcategory",
             joinColumns = @JoinColumn(name = "product_id"),
@@ -65,6 +66,9 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manufacturer_id")
     private Manufacturer manufacturer;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<PriceHistory> priceHistory;
 
     public Product() {}
 
@@ -95,10 +99,11 @@ public class Product {
     public void setBrand(Brand brand) { this.brand = brand; }
     public Manufacturer getManufacturer() { return manufacturer; }
     public void setManufacturer(Manufacturer manufacturer) { this.manufacturer = manufacturer; }
+    public List<PriceHistory> getPriceHistory() { return priceHistory; }
+    public void setPriceHistory(List<PriceHistory> priceHistory) { this.priceHistory = priceHistory; }
 
     @Override
     public String toString() {
         return name;
     }
 }
-
