@@ -1,7 +1,7 @@
 package com.ferozfaiz.cti_product.product;
 
 import com.ferozfaiz.cti_product.brand.Brand;
-import com.ferozfaiz.cti_product.category.Category;
+import com.ferozfaiz.cti_product.category.CTICategory;
 import com.ferozfaiz.cti_product.manufacturer.Manufacturer;
 import com.ferozfaiz.cti_product.pricehistory.PriceHistory;
 import com.ferozfaiz.cti_product.producttype.ProductType;
@@ -58,7 +58,7 @@ public class Product {
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private Set<Category> categories = new HashSet<>();
+    private Set<CTICategory> categories = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
@@ -94,8 +94,8 @@ public class Product {
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
     public String getSlug() { return slug; }
     public void setSlug(String slug) { this.slug = slug; }
-    public Set<Category> getCategories() { return categories; }
-    public void setCategories(Set<Category> categories) { this.categories = categories; }
+    public Set<CTICategory> getCategories() { return categories; }
+    public void setCategories(Set<CTICategory> categories) { this.categories = categories; }
     public Brand getBrand() { return brand; }
     public void setBrand(Brand brand) { this.brand = brand; }
     public Manufacturer getManufacturer() { return manufacturer; }

@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CategoryService extends MaterializedPathService<Category, Long> {
+public class CTICategoryService extends MaterializedPathService<CTICategory, Long> {
     @Autowired
-    public CategoryService(CategoryRepository repository) {
+    public CTICategoryService(CTICategoryRepository repository) {
         super(repository);
     }
 }

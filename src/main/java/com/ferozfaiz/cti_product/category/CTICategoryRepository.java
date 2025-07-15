@@ -4,6 +4,6 @@ import com.ferozfaiz.common.tree.materializedpath.MaterializedPathRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CategoryRepository extends MaterializedPathRepository<Category, Long> {
+public interface CTICategoryRepository extends MaterializedPathRepository<CTICategory, Long> {
 }
 

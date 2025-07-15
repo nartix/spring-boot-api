@@ -1,6 +1,6 @@
 package com.ferozfaiz.cti_product.productcategory;
 
-import com.ferozfaiz.cti_product.category.Category;
+import com.ferozfaiz.cti_product.category.CTICategory;
 import com.ferozfaiz.cti_product.product.Product;
 import jakarta.persistence.*;
 
@@ -21,25 +21,25 @@ public class ProductCategory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    private CTICategory CTICategory;
 
     public ProductCategory() {}
 
-    public ProductCategory(Product product, Category category) {
+    public ProductCategory(Product product, CTICategory CTICategory) {
         this.product = product;
-        this.category = category;
+        this.CTICategory = CTICategory;
     }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Product getProduct() { return product; }
     public void setProduct(Product product) { this.product = product; }
-    public Category getCategory() { return category; }
-    public void setCategory(Category category) { this.category = category; }
+    public CTICategory getCategory() { return CTICategory; }
+    public void setCategory(CTICategory CTICategory) { this.CTICategory = CTICategory; }
 
     @Override
     public String toString() {
-        return product.getName() + " - " + category.getName();
+        return product.getName() + " - " + CTICategory.getName();
     }
 }
 

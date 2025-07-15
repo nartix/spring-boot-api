@@ -264,7 +264,7 @@
     </changeSet>
 
     <changeSet  author="Feroz" id="create_category_table">
-        <createTable tableName="category">
+        <createTable tableName="CTICategory">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" primaryKeyName="category_pk" />
             </column>
@@ -282,10 +282,10 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
-        <createIndex tableName="category" indexName="category_path_idx" unique="true">
+        <createIndex tableName="CTICategory" indexName="category_path_idx" unique="true">
             <column name="path" />
         </createIndex>
-        <createIndex tableName="category" indexName="category_name_idx">
+        <createIndex tableName="CTICategory" indexName="category_name_idx">
             <column name="name" />
         </createIndex>
     </changeSet>

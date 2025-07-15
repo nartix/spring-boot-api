@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+@Service("CTIProductCategoryService")
 public class ProductCategoryService {
     private final ProductCategoryRepository repository;
 
