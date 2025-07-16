@@ -7,6 +7,9 @@ import jakarta.persistence.*;
 @Table(name = "cti_ram")
 public class RAM {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @OneToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
@@ -53,15 +56,137 @@ public class RAM {
     @Column(name = "bandwidth", length = 20)
     private String bandwidth;
 
-    @Column(name = "capacity_gb")
-    private Integer capacityGb;
+    public Long getId() {
+        return id;
+    }
 
-    // Getters and setters
-    // ...
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public Integer getSpeedMhz() {
+        return speedMhz;
+    }
+
+    public void setSpeedMhz(Integer speedMhz) {
+        this.speedMhz = speedMhz;
+    }
+
+    public String getMemoryType() {
+        return memoryType;
+    }
+
+    public void setMemoryType(String memoryType) {
+        this.memoryType = memoryType;
+    }
+
+    public String getFormFactor() {
+        return formFactor;
+    }
+
+    public void setFormFactor(String formFactor) {
+        this.formFactor = formFactor;
+    }
+
+    public Float getVoltage() {
+        return voltage;
+    }
+
+    public void setVoltage(Float voltage) {
+        this.voltage = voltage;
+    }
+
+    public String getLatencyCas() {
+        return latencyCas;
+    }
+
+    public void setLatencyCas(String latencyCas) {
+        this.latencyCas = latencyCas;
+    }
+
+    public Boolean getEcc() {
+        return ecc;
+    }
+
+    public void setEcc(Boolean ecc) {
+        this.ecc = ecc;
+    }
+
+    public Boolean getBuffered() {
+        return buffered;
+    }
+
+    public void setBuffered(Boolean buffered) {
+        this.buffered = buffered;
+    }
+
+    public Boolean getRegistered() {
+        return registered;
+    }
+
+    public void setRegistered(Boolean registered) {
+        this.registered = registered;
+    }
+
+    public String getRank() {
+        return rank;
+    }
+
+    public void setRank(String rank) {
+        this.rank = rank;
+    }
+
+    public Integer getModuleCount() {
+        return moduleCount;
+    }
+
+    public void setModuleCount(Integer moduleCount) {
+        this.moduleCount = moduleCount;
+    }
+
+    public Boolean getHeatSpreader() {
+        return heatSpreader;
+    }
+
+    public void setHeatSpreader(Boolean heatSpreader) {
+        this.heatSpreader = heatSpreader;
+    }
+
+    public Integer getWarrantyYears() {
+        return warrantyYears;
+    }
+
+    public void setWarrantyYears(Integer warrantyYears) {
+        this.warrantyYears = warrantyYears;
+    }
+
+    public String getXmpProfiles() {
+        return xmpProfiles;
+    }
+
+    public void setXmpProfiles(String xmpProfiles) {
+        this.xmpProfiles = xmpProfiles;
+    }
+
+    public String getBandwidth() {
+        return bandwidth;
+    }
+
+    public void setBandwidth(String bandwidth) {
+        this.bandwidth = bandwidth;
+    }
 
     @Override
     public String toString() {
-        return product.getName() + " - " + capacityGb + "GB " + memoryType + " " + speedMhz + "MHz";
+        return product.getName() + " - " + memoryType + " " + speedMhz + "MHz";
     }
 }
 

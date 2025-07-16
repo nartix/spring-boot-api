@@ -263,32 +263,34 @@
                 validate="true" />
     </changeSet>
 
-    <changeSet  author="Feroz" id="create_category_table">
-        <createTable tableName="CTICategory">
+    <!-- Category changesets -->
+    <changeSet id="create_category_table" author="Feroz">
+        <createTable tableName="category">
             <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false" primaryKeyName="category_pk" />
+                <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="path" type="VARCHAR(255)">
-                <constraints nullable="false" unique="true" />
+                <constraints nullable="false"/>
             </column>
-            <column name="depth" type="INT">
-                <constraints nullable="false" />
+            <column name="depth" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
             </column>
-            <column name="numchild" type="INT" defaultValue="0">
-                <constraints nullable="false" />
+            <column name="numchild" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
             </column>
-            <!-- not part of mptree package -->
             <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
         </createTable>
-        <createIndex tableName="CTICategory" indexName="category_path_idx" unique="true">
-            <column name="path" />
+
+        <createIndex indexName="category_name_idx" tableName="category">
+            <column name="name"/>
         </createIndex>
-        <createIndex tableName="CTICategory" indexName="category_name_idx">
-            <column name="name" />
+        <createIndex indexName="category_path_idx" tableName="category">
+            <column name="path"/>
         </createIndex>
     </changeSet>
+
 
     <!-- Product changesets -->
     <changeSet id="create_product_category_table" author="Feroz">
@@ -771,11 +773,13 @@
                 onDelete="RESTRICT"/>
     </changeSet>
 
-
     <changeSet id="create_cti_harddrive_table" author="Feroz">
         <createTable tableName="cti_harddrive">
-            <column name="product_id" type="BIGINT">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false"/>
             </column>
             <column name="interface_type" type="VARCHAR(64)">
                 <constraints nullable="false"/>
@@ -820,8 +824,11 @@
     </changeSet>
     <changeSet id="create_cti_ram_table" author="Feroz">
         <createTable tableName="cti_ram">
-            <column name="product_id" type="BIGINT">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints  nullable="false"/>
             </column>
             <column name="speed_mhz" type="INT">
                 <constraints nullable="false"/>
@@ -854,8 +861,11 @@
     </changeSet>
     <changeSet id="create_cti_storage_media_table" author="Feroz">
         <createTable tableName="cti_storage_media">
-            <column name="product_id" type="BIGINT">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false"/>
             </column>
             <column name="capacity_gb" type="INT">
                 <constraints nullable="false"/>
@@ -870,7 +880,91 @@
                 onDelete="CASCADE"/>
     </changeSet>
 
+    <changeSet id="create_cti_pricehistory_table" author="Feroz">
+        <createTable tableName="cti_pricehistory">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="is_current" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
 
+        <createIndex indexName="cti_pricehistory_product_start_date_idx" tableName="cti_pricehistory">
+            <column name="product_id"/>
+            <column name="start_date" descending="true"/>
+        </createIndex>
 
+        <createIndex indexName="cti_pricehistory_is_current_idx" tableName="cti_pricehistory">
+            <column name="is_current"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+                baseTableName="cti_pricehistory"
+                baseColumnNames="product_id"
+                constraintName="fk_cti_pricehistory_product"
+                referencedTableName="cti_product"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+    </changeSet>
+    <changeSet id="cti_pricehistory_product_end_date_idx" author="Feroz">
+        <createIndex indexName="cti_pricehistory_product_end_date_idx"
+                     tableName="cti_pricehistory">
+            <column name="product_id"/>
+            <column name="end_date" descending="true"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="create_cti_productcategory_table" author="Feroz">
+        <createTable tableName="cti_productcategory">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+                tableName="cti_productcategory"
+                columnNames="product_id, category_id"
+                constraintName="uq_cti_productcategory_product_category"/>
+
+        <createIndex
+                indexName="cti_productcategory_product_category_idx"
+                tableName="cti_productcategory">
+            <column name="product_id"/>
+            <column name="category_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+                baseTableName="cti_productcategory"
+                baseColumnNames="product_id"
+                constraintName="fk_cti_productcategory_product"
+                referencedTableName="cti_product"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+                baseTableName="cti_productcategory"
+                baseColumnNames="category_id"
+                constraintName="fk_cti_productcategory_category"
+                referencedTableName="cti_category"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+    </changeSet>
 
 </databaseChangeLog>

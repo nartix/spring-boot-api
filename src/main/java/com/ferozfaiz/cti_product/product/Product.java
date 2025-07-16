@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Entity
+@Entity(name = "CTIProduct")
 @Table(name = "cti_product", indexes = {
         @Index(name = "cti_product_name_idx", columnList = "name"),
         @Index(name = "cti_product_slug_idx", columnList = "slug"),

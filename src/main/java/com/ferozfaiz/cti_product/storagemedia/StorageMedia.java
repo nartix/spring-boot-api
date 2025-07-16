@@ -7,14 +7,23 @@ import jakarta.persistence.*;
 @Table(name = "cti_storage_media")
 public class StorageMedia {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_cti_storage_media_product"))
     private Product product;
 
     @Column(name = "capacity_gb", nullable = false)
     private Integer capacityGb;
 
-    // Add other storage media fields as needed
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public StorageMedia() {}
 
@@ -34,4 +43,3 @@ public class StorageMedia {
         this.capacityGb = capacityGb;
     }
 }
-

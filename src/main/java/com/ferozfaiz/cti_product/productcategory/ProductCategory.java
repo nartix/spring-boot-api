@@ -4,7 +4,7 @@ import com.ferozfaiz.cti_product.category.CTICategory;
 import com.ferozfaiz.cti_product.product.Product;
 import jakarta.persistence.*;
 
-@Entity
+@Entity(name = "CTIProductCategory")
 @Table(name = "cti_productcategory", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"product_id", "category_id"})
 }, indexes = {
