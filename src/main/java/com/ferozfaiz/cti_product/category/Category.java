@@ -4,12 +4,12 @@ import com.ferozfaiz.common.tree.materializedpath.MaterializedPathNode;
 import jakarta.persistence.*;
 
 
-@Entity
+@Entity(name = "CTICategory")
 @Table(name = "cti_category", indexes = {
         @Index(columnList = "name"),
         @Index(columnList = "path")
 })
-public class CTICategory extends MaterializedPathNode<CTICategory> {
+public class Category extends MaterializedPathNode<Category> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,15 +20,15 @@ public class CTICategory extends MaterializedPathNode<CTICategory> {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    public CTICategory() {}
+    public Category() {}
 
-    public CTICategory(String path, int depth, int numChild, String name, String description) {
+    public Category(String path, int depth, int numChild, String name, String description) {
         super(path, depth, numChild, name);
         this.name = name;
         this.description = description;
     }
 
-    public CTICategory(String name, String description) {
+    public Category(String name, String description) {
         this.name = name;
         this.description = description;
     }
