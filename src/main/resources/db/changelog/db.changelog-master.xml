@@ -623,348 +623,349 @@
         </createIndex>
     </changeSet>
 
+
     <!-- Testing: Class Table Inheritance for products -->
-    <changeSet id="create_cti_category_table" author="Feroz">
-        <createTable tableName="cti_category">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="path" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="depth" type="INT" defaultValueNumeric="1">
-                <constraints nullable="false"/>
-            </column>
-            <column name="numchild" type="INT" defaultValueNumeric="0">
-                <constraints nullable="false"/>
-            </column>
-            <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="description" type="TEXT"/>
-        </createTable>
-        <createIndex indexName="cti_category_name_idx" tableName="cti_category">
-            <column name="name"/>
-        </createIndex>
-        <createIndex indexName="cti_category_path_idx" tableName="cti_category">
-            <column name="path"/>
-        </createIndex>
-    </changeSet>
-    <changeSet id="create_cti_product_type_table" author="Feroz">
-        <createTable tableName="cti_product_type">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="VARCHAR(100)">
-                <constraints nullable="false" unique="true"/>
-            </column>
-            <column name="description" type="TEXT"/>
-        </createTable>
-        <createIndex indexName="cti_product_type_name_idx" tableName="cti_product_type">
-            <column name="name"/>
-        </createIndex>
-    </changeSet>
-    <changeSet id="create_cti_measurementunit_table" author="Feroz">
-        <createTable tableName="cti_measurementunit">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="symbol" type="VARCHAR(10)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="conversion_factor" type="FLOAT"/>
-        </createTable>
-        <createIndex indexName="cti_measurementunit_name_idx" tableName="cti_measurementunit">
-            <column name="name"/>
-        </createIndex>
-        <createIndex indexName="cti_measurementunit_symbol_idx" tableName="cti_measurementunit">
-            <column name="symbol"/>
-        </createIndex>
-    </changeSet>
-    <changeSet id="create_cti_brand_table" author="Feroz">
-        <createTable tableName="cti_brand">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false" unique="true"/>
-            </column>
-        </createTable>
-        <createIndex indexName="cti_brand_name_idx" tableName="cti_brand">
-            <column name="name"/>
-        </createIndex>
-    </changeSet>
-    <changeSet id="create_cti_manufacturer_table" author="Feroz">
-        <createTable tableName="cti_manufacturer">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        <createIndex indexName="cti_manufacturer_name_idx" tableName="cti_manufacturer">
-            <column name="name"/>
-        </createIndex>
-    </changeSet>
+<!--    <changeSet id="create_cti_category_table" author="Feroz">-->
+<!--        <createTable tableName="cti_category">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="path" type="VARCHAR(255)">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="depth" type="INT" defaultValueNumeric="1">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="numchild" type="INT" defaultValueNumeric="0">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="name" type="VARCHAR(255)">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="description" type="TEXT"/>-->
+<!--        </createTable>-->
+<!--        <createIndex indexName="cti_category_name_idx" tableName="cti_category">-->
+<!--            <column name="name"/>-->
+<!--        </createIndex>-->
+<!--        <createIndex indexName="cti_category_path_idx" tableName="cti_category">-->
+<!--            <column name="path"/>-->
+<!--        </createIndex>-->
+<!--    </changeSet>-->
+<!--    <changeSet id="create_cti_product_type_table" author="Feroz">-->
+<!--        <createTable tableName="cti_product_type">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="name" type="VARCHAR(100)">-->
+<!--                <constraints nullable="false" unique="true"/>-->
+<!--            </column>-->
+<!--            <column name="description" type="TEXT"/>-->
+<!--        </createTable>-->
+<!--        <createIndex indexName="cti_product_type_name_idx" tableName="cti_product_type">-->
+<!--            <column name="name"/>-->
+<!--        </createIndex>-->
+<!--    </changeSet>-->
+<!--    <changeSet id="create_cti_measurementunit_table" author="Feroz">-->
+<!--        <createTable tableName="cti_measurementunit">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="name" type="VARCHAR(50)">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="symbol" type="VARCHAR(10)">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="conversion_factor" type="FLOAT"/>-->
+<!--        </createTable>-->
+<!--        <createIndex indexName="cti_measurementunit_name_idx" tableName="cti_measurementunit">-->
+<!--            <column name="name"/>-->
+<!--        </createIndex>-->
+<!--        <createIndex indexName="cti_measurementunit_symbol_idx" tableName="cti_measurementunit">-->
+<!--            <column name="symbol"/>-->
+<!--        </createIndex>-->
+<!--    </changeSet>-->
+<!--    <changeSet id="create_cti_brand_table" author="Feroz">-->
+<!--        <createTable tableName="cti_brand">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="name" type="VARCHAR(255)">-->
+<!--                <constraints nullable="false" unique="true"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
+<!--        <createIndex indexName="cti_brand_name_idx" tableName="cti_brand">-->
+<!--            <column name="name"/>-->
+<!--        </createIndex>-->
+<!--    </changeSet>-->
+<!--    <changeSet id="create_cti_manufacturer_table" author="Feroz">-->
+<!--        <createTable tableName="cti_manufacturer">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="name" type="VARCHAR(255)">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
+<!--        <createIndex indexName="cti_manufacturer_name_idx" tableName="cti_manufacturer">-->
+<!--            <column name="name"/>-->
+<!--        </createIndex>-->
+<!--    </changeSet>-->
 
-    <changeSet id="create_cti_product_table" author="Feroz">
-        <createTable tableName="cti_product">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="created_at" type="TIMESTAMP WITH TIME ZONE"/>
-            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE"/>
-            <column name="product_type_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="description" type="TEXT"/>
-            <column name="base_price" type="DECIMAL(10,2)" defaultValueNumeric="0.00">
-                <constraints nullable="false"/>
-            </column>
-            <column name="view_count" type="INT" defaultValueNumeric="0">
-                <constraints nullable="false"/>
-            </column>
-            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true">
-                <constraints nullable="false"/>
-            </column>
-            <column name="slug" type="VARCHAR(255)"/>
-            <column name="brand_id" type="BIGINT"/>
-            <column name="manufacturer_id" type="BIGINT"/>
-        </createTable>
-        <createIndex indexName="cti_product_name_idx" tableName="cti_product">
-            <column name="name"/>
-        </createIndex>
-        <createIndex indexName="cti_product_slug_idx" tableName="cti_product">
-            <column name="slug"/>
-        </createIndex>
-        <createIndex indexName="cti_product_base_price_idx" tableName="cti_product">
-            <column name="base_price"/>
-        </createIndex>
-        <createIndex indexName="cti_product_is_active_idx" tableName="cti_product">
-            <column name="is_active"/>
-        </createIndex>
-        <addForeignKeyConstraint
-                baseTableName="cti_product"
-                baseColumnNames="brand_id"
-                constraintName="fk_cti_product_brand"
-                referencedTableName="cti_brand"
-                referencedColumnNames="id"
-                onDelete="SET NULL"/>
-        <addForeignKeyConstraint
-                baseTableName="cti_product"
-                baseColumnNames="manufacturer_id"
-                constraintName="fk_cti_product_manufacturer"
-                referencedTableName="cti_manufacturer"
-                referencedColumnNames="id"
-                onDelete="SET NULL"/>
-        <addForeignKeyConstraint
-                baseTableName="cti_product"
-                baseColumnNames="product_type_id"
-                constraintName="fk_cti_product_product_type"
-                referencedTableName="cti_product_type"
-                referencedColumnNames="id"
-                onDelete="RESTRICT"/>
-    </changeSet>
+<!--    <changeSet id="create_cti_product_table" author="Feroz">-->
+<!--        <createTable tableName="cti_product">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="created_at" type="TIMESTAMP WITH TIME ZONE"/>-->
+<!--            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE"/>-->
+<!--            <column name="product_type_id" type="BIGINT">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="name" type="VARCHAR(255)">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="description" type="TEXT"/>-->
+<!--            <column name="base_price" type="DECIMAL(10,2)" defaultValueNumeric="0.00">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="view_count" type="INT" defaultValueNumeric="0">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="slug" type="VARCHAR(255)"/>-->
+<!--            <column name="brand_id" type="BIGINT"/>-->
+<!--            <column name="manufacturer_id" type="BIGINT"/>-->
+<!--        </createTable>-->
+<!--        <createIndex indexName="cti_product_name_idx" tableName="cti_product">-->
+<!--            <column name="name"/>-->
+<!--        </createIndex>-->
+<!--        <createIndex indexName="cti_product_slug_idx" tableName="cti_product">-->
+<!--            <column name="slug"/>-->
+<!--        </createIndex>-->
+<!--        <createIndex indexName="cti_product_base_price_idx" tableName="cti_product">-->
+<!--            <column name="base_price"/>-->
+<!--        </createIndex>-->
+<!--        <createIndex indexName="cti_product_is_active_idx" tableName="cti_product">-->
+<!--            <column name="is_active"/>-->
+<!--        </createIndex>-->
+<!--        <addForeignKeyConstraint-->
+<!--                baseTableName="cti_product"-->
+<!--                baseColumnNames="brand_id"-->
+<!--                constraintName="fk_cti_product_brand"-->
+<!--                referencedTableName="cti_brand"-->
+<!--                referencedColumnNames="id"-->
+<!--                onDelete="SET NULL"/>-->
+<!--        <addForeignKeyConstraint-->
+<!--                baseTableName="cti_product"-->
+<!--                baseColumnNames="manufacturer_id"-->
+<!--                constraintName="fk_cti_product_manufacturer"-->
+<!--                referencedTableName="cti_manufacturer"-->
+<!--                referencedColumnNames="id"-->
+<!--                onDelete="SET NULL"/>-->
+<!--        <addForeignKeyConstraint-->
+<!--                baseTableName="cti_product"-->
+<!--                baseColumnNames="product_type_id"-->
+<!--                constraintName="fk_cti_product_product_type"-->
+<!--                referencedTableName="cti_product_type"-->
+<!--                referencedColumnNames="id"-->
+<!--                onDelete="RESTRICT"/>-->
+<!--    </changeSet>-->
 
-    <changeSet id="create_cti_harddrive_table" author="Feroz">
-        <createTable tableName="cti_harddrive">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="product_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="interface_type" type="VARCHAR(64)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="form_factor" type="VARCHAR(32)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="rpm" type="INT"/>
-            <column name="cache_mb" type="INT"/>
-            <column name="read_speed_mbps" type="INT"/>
-            <column name="write_speed_mbps" type="INT"/>
-            <column name="is_ssd" type="BOOLEAN" defaultValueBoolean="false">
-                <constraints nullable="false"/>
-            </column>
-            <column name="endurance_tbw" type="INT"/>
-            <column name="warranty_years" type="INT"/>
-            <column name="dimensions_mm" type="VARCHAR(64)"/>
-            <column name="weight_grams" type="INT"/>
-            <column name="power_consumption_watts" type="FLOAT"/>
-            <column name="shock_resistance_g" type="INT"/>
-            <column name="temperature_range_celsius" type="VARCHAR(64)"/>
-            <column name="mtbf_hours" type="INT"/>
-            <column name="ssd_technology" type="VARCHAR(20)"/>
-            <column name="recording_technology" type="VARCHAR(20)"/>
-        </createTable>
-        <createIndex indexName="cti_harddrive_interface_type_idx" tableName="cti_harddrive">
-            <column name="interface_type"/>
-        </createIndex>
-        <createIndex indexName="cti_harddrive_form_factor_idx" tableName="cti_harddrive">
-            <column name="form_factor"/>
-        </createIndex>
-        <createIndex indexName="cti_harddrive_is_ssd_idx" tableName="cti_harddrive">
-            <column name="is_ssd"/>
-        </createIndex>
-        <addForeignKeyConstraint
-                baseTableName="cti_harddrive"
-                baseColumnNames="product_id"
-                constraintName="fk_cti_harddrive_product"
-                referencedTableName="cti_product"
-                referencedColumnNames="id"
-                onDelete="CASCADE"/>
-    </changeSet>
-    <changeSet id="create_cti_ram_table" author="Feroz">
-        <createTable tableName="cti_ram">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="product_id" type="BIGINT">
-                <constraints  nullable="false"/>
-            </column>
-            <column name="speed_mhz" type="INT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="memory_type" type="VARCHAR(32)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="form_factor" type="VARCHAR(32)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="voltage" type="FLOAT"/>
-            <column name="latency_cas" type="VARCHAR(16)"/>
-            <column name="ecc" type="BOOLEAN" defaultValueBoolean="false"/>
-            <column name="buffered" type="BOOLEAN" defaultValueBoolean="false"/>
-            <column name="registered" type="BOOLEAN" defaultValueBoolean="false"/>
-            <column name="rank" type="VARCHAR(32)"/>
-            <column name="module_count" type="INT" defaultValueNumeric="1"/>
-            <column name="heat_spreader" type="BOOLEAN" defaultValueBoolean="false"/>
-            <column name="warranty_years" type="INT"/>
-            <column name="xmp_profiles" type="VARCHAR(50)"/>
-            <column name="bandwidth" type="VARCHAR(20)"/>
-        </createTable>
-        <addForeignKeyConstraint
-                baseTableName="cti_ram"
-                baseColumnNames="product_id"
-                constraintName="fk_cti_ram_product"
-                referencedTableName="cti_product"
-                referencedColumnNames="id"
-                onDelete="CASCADE"/>
-    </changeSet>
-    <changeSet id="create_cti_storage_media_table" author="Feroz">
-        <createTable tableName="cti_storage_media">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="product_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="capacity_gb" type="INT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        <addForeignKeyConstraint
-                baseTableName="cti_storage_media"
-                baseColumnNames="product_id"
-                constraintName="fk_cti_storage_media_product"
-                referencedTableName="cti_product"
-                referencedColumnNames="id"
-                onDelete="CASCADE"/>
-    </changeSet>
+<!--    <changeSet id="create_cti_harddrive_table" author="Feroz">-->
+<!--        <createTable tableName="cti_harddrive">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="product_id" type="BIGINT">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="interface_type" type="VARCHAR(64)">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="form_factor" type="VARCHAR(32)">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="rpm" type="INT"/>-->
+<!--            <column name="cache_mb" type="INT"/>-->
+<!--            <column name="read_speed_mbps" type="INT"/>-->
+<!--            <column name="write_speed_mbps" type="INT"/>-->
+<!--            <column name="is_ssd" type="BOOLEAN" defaultValueBoolean="false">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="endurance_tbw" type="INT"/>-->
+<!--            <column name="warranty_years" type="INT"/>-->
+<!--            <column name="dimensions_mm" type="VARCHAR(64)"/>-->
+<!--            <column name="weight_grams" type="INT"/>-->
+<!--            <column name="power_consumption_watts" type="FLOAT"/>-->
+<!--            <column name="shock_resistance_g" type="INT"/>-->
+<!--            <column name="temperature_range_celsius" type="VARCHAR(64)"/>-->
+<!--            <column name="mtbf_hours" type="INT"/>-->
+<!--            <column name="ssd_technology" type="VARCHAR(20)"/>-->
+<!--            <column name="recording_technology" type="VARCHAR(20)"/>-->
+<!--        </createTable>-->
+<!--        <createIndex indexName="cti_harddrive_interface_type_idx" tableName="cti_harddrive">-->
+<!--            <column name="interface_type"/>-->
+<!--        </createIndex>-->
+<!--        <createIndex indexName="cti_harddrive_form_factor_idx" tableName="cti_harddrive">-->
+<!--            <column name="form_factor"/>-->
+<!--        </createIndex>-->
+<!--        <createIndex indexName="cti_harddrive_is_ssd_idx" tableName="cti_harddrive">-->
+<!--            <column name="is_ssd"/>-->
+<!--        </createIndex>-->
+<!--        <addForeignKeyConstraint-->
+<!--                baseTableName="cti_harddrive"-->
+<!--                baseColumnNames="product_id"-->
+<!--                constraintName="fk_cti_harddrive_product"-->
+<!--                referencedTableName="cti_product"-->
+<!--                referencedColumnNames="id"-->
+<!--                onDelete="CASCADE"/>-->
+<!--    </changeSet>-->
+<!--    <changeSet id="create_cti_ram_table" author="Feroz">-->
+<!--        <createTable tableName="cti_ram">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="product_id" type="BIGINT">-->
+<!--                <constraints  nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="speed_mhz" type="INT">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="memory_type" type="VARCHAR(32)">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="form_factor" type="VARCHAR(32)">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="voltage" type="FLOAT"/>-->
+<!--            <column name="latency_cas" type="VARCHAR(16)"/>-->
+<!--            <column name="ecc" type="BOOLEAN" defaultValueBoolean="false"/>-->
+<!--            <column name="buffered" type="BOOLEAN" defaultValueBoolean="false"/>-->
+<!--            <column name="registered" type="BOOLEAN" defaultValueBoolean="false"/>-->
+<!--            <column name="rank" type="VARCHAR(32)"/>-->
+<!--            <column name="module_count" type="INT" defaultValueNumeric="1"/>-->
+<!--            <column name="heat_spreader" type="BOOLEAN" defaultValueBoolean="false"/>-->
+<!--            <column name="warranty_years" type="INT"/>-->
+<!--            <column name="xmp_profiles" type="VARCHAR(50)"/>-->
+<!--            <column name="bandwidth" type="VARCHAR(20)"/>-->
+<!--        </createTable>-->
+<!--        <addForeignKeyConstraint-->
+<!--                baseTableName="cti_ram"-->
+<!--                baseColumnNames="product_id"-->
+<!--                constraintName="fk_cti_ram_product"-->
+<!--                referencedTableName="cti_product"-->
+<!--                referencedColumnNames="id"-->
+<!--                onDelete="CASCADE"/>-->
+<!--    </changeSet>-->
+<!--    <changeSet id="create_cti_storage_media_table" author="Feroz">-->
+<!--        <createTable tableName="cti_storage_media">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="product_id" type="BIGINT">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="capacity_gb" type="INT">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
+<!--        <addForeignKeyConstraint-->
+<!--                baseTableName="cti_storage_media"-->
+<!--                baseColumnNames="product_id"-->
+<!--                constraintName="fk_cti_storage_media_product"-->
+<!--                referencedTableName="cti_product"-->
+<!--                referencedColumnNames="id"-->
+<!--                onDelete="CASCADE"/>-->
+<!--    </changeSet>-->
 
-    <changeSet id="create_cti_pricehistory_table" author="Feroz">
-        <createTable tableName="cti_pricehistory">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="product_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="price" type="DECIMAL(10,2)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="start_date" type="TIMESTAMP WITH TIME ZONE">
-                <constraints nullable="false"/>
-            </column>
-            <column name="end_date" type="TIMESTAMP WITH TIME ZONE"/>
-            <column name="is_current" type="BOOLEAN" defaultValueBoolean="true">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
+<!--    <changeSet id="create_cti_pricehistory_table" author="Feroz">-->
+<!--        <createTable tableName="cti_pricehistory">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="product_id" type="BIGINT">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="price" type="DECIMAL(10,2)">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="start_date" type="TIMESTAMP WITH TIME ZONE">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="end_date" type="TIMESTAMP WITH TIME ZONE"/>-->
+<!--            <column name="is_current" type="BOOLEAN" defaultValueBoolean="true">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
 
-        <createIndex indexName="cti_pricehistory_product_start_date_idx" tableName="cti_pricehistory">
-            <column name="product_id"/>
-            <column name="start_date" descending="true"/>
-        </createIndex>
+<!--        <createIndex indexName="cti_pricehistory_product_start_date_idx" tableName="cti_pricehistory">-->
+<!--            <column name="product_id"/>-->
+<!--            <column name="start_date" descending="true"/>-->
+<!--        </createIndex>-->
 
-        <createIndex indexName="cti_pricehistory_is_current_idx" tableName="cti_pricehistory">
-            <column name="is_current"/>
-        </createIndex>
+<!--        <createIndex indexName="cti_pricehistory_is_current_idx" tableName="cti_pricehistory">-->
+<!--            <column name="is_current"/>-->
+<!--        </createIndex>-->
 
-        <addForeignKeyConstraint
-                baseTableName="cti_pricehistory"
-                baseColumnNames="product_id"
-                constraintName="fk_cti_pricehistory_product"
-                referencedTableName="cti_product"
-                referencedColumnNames="id"
-                onDelete="CASCADE"/>
-    </changeSet>
-    <changeSet id="cti_pricehistory_product_end_date_idx" author="Feroz">
-        <createIndex indexName="cti_pricehistory_product_end_date_idx"
-                     tableName="cti_pricehistory">
-            <column name="product_id"/>
-            <column name="end_date" descending="true"/>
-        </createIndex>
-    </changeSet>
+<!--        <addForeignKeyConstraint-->
+<!--                baseTableName="cti_pricehistory"-->
+<!--                baseColumnNames="product_id"-->
+<!--                constraintName="fk_cti_pricehistory_product"-->
+<!--                referencedTableName="cti_product"-->
+<!--                referencedColumnNames="id"-->
+<!--                onDelete="CASCADE"/>-->
+<!--    </changeSet>-->
+<!--    <changeSet id="cti_pricehistory_product_end_date_idx" author="Feroz">-->
+<!--        <createIndex indexName="cti_pricehistory_product_end_date_idx"-->
+<!--                     tableName="cti_pricehistory">-->
+<!--            <column name="product_id"/>-->
+<!--            <column name="end_date" descending="true"/>-->
+<!--        </createIndex>-->
+<!--    </changeSet>-->
 
-    <changeSet id="create_cti_productcategory_table" author="Feroz">
-        <createTable tableName="cti_productcategory">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="product_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="category_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
+<!--    <changeSet id="create_cti_productcategory_table" author="Feroz">-->
+<!--        <createTable tableName="cti_productcategory">-->
+<!--            <column name="id" type="BIGINT" autoIncrement="true">-->
+<!--                <constraints primaryKey="true" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="product_id" type="BIGINT">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="category_id" type="BIGINT">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
 
-        <addUniqueConstraint
-                tableName="cti_productcategory"
-                columnNames="product_id, category_id"
-                constraintName="uq_cti_productcategory_product_category"/>
+<!--        <addUniqueConstraint-->
+<!--                tableName="cti_productcategory"-->
+<!--                columnNames="product_id, category_id"-->
+<!--                constraintName="uq_cti_productcategory_product_category"/>-->
 
-        <createIndex
-                indexName="cti_productcategory_product_category_idx"
-                tableName="cti_productcategory">
-            <column name="product_id"/>
-            <column name="category_id"/>
-        </createIndex>
+<!--        <createIndex-->
+<!--                indexName="cti_productcategory_product_category_idx"-->
+<!--                tableName="cti_productcategory">-->
+<!--            <column name="product_id"/>-->
+<!--            <column name="category_id"/>-->
+<!--        </createIndex>-->
 
-        <addForeignKeyConstraint
-                baseTableName="cti_productcategory"
-                baseColumnNames="product_id"
-                constraintName="fk_cti_productcategory_product"
-                referencedTableName="cti_product"
-                referencedColumnNames="id"
-                onDelete="CASCADE"/>
+<!--        <addForeignKeyConstraint-->
+<!--                baseTableName="cti_productcategory"-->
+<!--                baseColumnNames="product_id"-->
+<!--                constraintName="fk_cti_productcategory_product"-->
+<!--                referencedTableName="cti_product"-->
+<!--                referencedColumnNames="id"-->
+<!--                onDelete="CASCADE"/>-->
 
-        <addForeignKeyConstraint
-                baseTableName="cti_productcategory"
-                baseColumnNames="category_id"
-                constraintName="fk_cti_productcategory_category"
-                referencedTableName="cti_category"
-                referencedColumnNames="id"
-                onDelete="CASCADE"/>
-    </changeSet>
+<!--        <addForeignKeyConstraint-->
+<!--                baseTableName="cti_productcategory"-->
+<!--                baseColumnNames="category_id"-->
+<!--                constraintName="fk_cti_productcategory_category"-->
+<!--                referencedTableName="cti_category"-->
+<!--                referencedColumnNames="id"-->
+<!--                onDelete="CASCADE"/>-->
+<!--    </changeSet>-->
 
 </databaseChangeLog>
