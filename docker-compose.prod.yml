@@ -1,0 +1,17 @@
+services:
+  spring-boot-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: spring-boot-api:prod
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      VAULT_ADDRESS: ${VAULT_ADDRESS:?Set VAULT_ADDRESS in .env}
+      VAULT_TOKEN: ${VAULT_TOKEN:?Set VAULT_TOKEN in .env}
+      TIMEZONE: ${TIMEZONE:-UTC}
+      TZ: ${TZ:-UTC}
+      JAVA_TOOL_OPTIONS: "${JAVA_TOOL_OPTIONS:--XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError}"
+    ports:
+      - "${APP_BIND_ADDRESS:-127.0.0.1}:${APP_PORT:-19091}:8080"
+    stop_grace_period: 30s
